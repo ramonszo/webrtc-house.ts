@@ -98,29 +98,23 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         const eventData = JSON.parse(event.data) as ShrughouseWebSocketMessage;
 
         if (eventData.media === 'initReceive') {
-          console.log('INIT RECEIVE ' + eventData.socket_id);
-          media.addPeer(socket, eventData.socket_id, false);
+          console.log('INIT RECEIVE ' + eventData.socketId);
+          media.addPeer(socket, eventData.socketId, false);
 
           socket.send(
             JSON.stringify({
               media: 'initSend',
-              socket_id: eventData.socket_id
+              socketId: eventData.socketId
             })
           );
         } else if (eventData.media === 'initSend') {
-          // socket_id
-
-          console.log('INIT SEND ' + eventData.socket_id);
-          media.addPeer(socket, eventData.socket_id, true);
+          console.log('INIT SEND ' + eventData.socketId);
+          media.addPeer(socket, eventData.socketId, true);
         } else if (eventData.media === 'removePeer') {
-          // socket_id
-
-          console.log('REMOVE PEER ' + eventData.socket_id);
-          media.removePeer(eventData.socket_id);
+          console.log('REMOVE PEER ' + eventData.socketId);
+          media.removePeer(eventData.socketId);
         } else if (eventData.media === 'signal') {
-          // data
-
-          mediaData.peers[eventData.socket_id].signal(eventData.signal);
+          mediaData.peers[eventData.socketId].signal(eventData.signal);
         }
       });
 
@@ -160,7 +154,7 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
           JSON.stringify({
             media: 'signal',
             signal: eventData,
-            socket_id: socketId
+            socketId: socketId
           })
         );
       });
@@ -362,11 +356,11 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
           console.log('error', eventData.error);
         } else if (eventData.joined) {
           room.addMember({
-            id: eventData.socket_id
+            id: eventData.socketId
           });
         } else if (eventData.quit) {
           room.removeMember({
-            id: eventData.socket_id
+            id: eventData.socketId
           });
         } else if (eventData.ready) {
           // All pre-join messages have been delivered.

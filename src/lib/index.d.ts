@@ -30,7 +30,7 @@ export type ShrughouseWebSocketEvent = WebSocket.IMessageEvent;
 export type ShrughouseWebSocketId = string;
 
 export type ShrughouseWebSocketMessage = {
-  socket_id: ShrughouseWebSocketId;
+  socketId: ShrughouseWebSocketId;
   media?: string
   signal?: SimplePeer.SignalData;
 };
