@@ -1,9 +1,248 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Test</title>
+    <title>Shrughouse.ts</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <style>
+      #name-form {
+        position: fixed;
+        z-index: 3;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+      }
+
+      #name-input {
+        position: fixed;
+        font-size: 200%;
+        top: calc(50% - 1em);
+        left: calc(50% - 8em);
+        width: 16em;
+        height: 2em;
+        margin: 0;
+        text-align: center;
+        border: 1px solid #bbb;
+      }
+
+      #name-form p {
+        position: fixed;
+        top: calc(50% + 3em);
+        width: 100%;
+        text-align: center;
+      }
+
+      #room-form {
+        position: fixed;
+        z-index: 2;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        font-size: 200%;
+        margin-top: calc(50vh - 3em);
+        text-align: center;
+      }
+
+      #room-name {
+        font-size: inherit;
+        border: 1px solid #bbb;
+        height: 2em;
+        width: 16em;
+        padding-left: 1em;
+      }
+
+      #room-form button {
+        font-size: inherit;
+        border: 1px solid #bbb;
+        background-color: #eee;
+        height: 2em;
+      }
+
+      #go-public {
+        width: 4em;
+      }
+      #go-private {
+        width: 20em;
+      }
+
+      #video-container {
+        position: relative;
+        z-index: 20;
+      }
+
+      .container {
+        display: flex;
+      }
+    </style>
   </head>
-  <body><script src="/scripts/app.js"></script></body>
+  <body>
+    <form id="name-form">
+      <input id="name-input" placeholder="your name" />
+    </form>
+
+    <form id="room-form">
+      <p>Enter a public room:</p>
+      <input id="room-name" placeholder="room name" /><button id="go-public">
+        Go &raquo;
+      </button>
+    </form>
+
+    <form id="room">
+      <div id="video-container">
+        <div id="videos" class="container"></div>
+      </div>
+    </form>
+
+    <script>
+      function app() {
+        const zuckHouse = Shrughouse({
+          state(data, oldData) {
+            const videos = document.querySelector('#videos');
+            const currentStreams = [];
+
+            const createVideo = (id, src) => {
+              if (!document.querySelector(`#${id}`)) {
+                let newVid = document.createElement('video');
+
+                newVid.srcObject = src;
+                newVid.id = id;
+                newVid.playsinline = false;
+                newVid.autoplay = true;
+                newVid.className = 'vid';
+
+                if (id === 'user') {
+                  newVid.muted = true;
+                }
+
+                videos.appendChild(newVid);
+              }
+            };
+
+            const removeVideo = (id) => {
+              const videoEl = document.querySelector(`#${id}`);
+
+              if (videoEl) {
+                const tracks = videoEl.srcObject.getTracks();
+
+                tracks.forEach(function (track) {
+                  track.stop();
+                });
+
+                videoEl.srcObject = null;
+                videoEl.parentNode.removeChild(videoEl);
+              }
+            };
+
+            if (data.user.stream) {
+              createVideo('user', data.user.stream);
+            } else {
+              removeVideo('user');
+            }
+
+            data.streams.forEach((stream) => {
+              currentStreams.push(stream.id);
+
+              createVideo(`stream-${stream.id}`, stream.stream);
+            });
+
+            oldData.streams.forEach((stream) => {
+              if (currentStreams.indexOf(stream.id) === -1) {
+                removeVideo(`stream-${stream.id}`);
+              }
+            });
+          },
+        });
+
+        function roomChooser() {
+          let roomForm = document.querySelector('#room-form');
+          let roomNameInput = document.querySelector('#room-name');
+          let goPublicButton = document.querySelector('#go-public');
+          let goPrivateButton = document.querySelector('#go-private');
+
+          const start = (name) => {
+            let roomForm = document.querySelector('#room-form');
+            roomForm.remove();
+
+            if (name.length > 0) {
+              zuckHouse.room.set({
+                name: name,
+              });
+
+              document.location.hash = name;
+
+              zuckHouse.room.start();
+            }
+          };
+
+          if (document.location.hash.length > 1) {
+            start(document.location.hash.slice(1));
+
+            return;
+          }
+
+          roomForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            start(roomNameInput.value);
+          });
+
+          roomNameInput.addEventListener('input', (event) => {
+            if (event.currentTarget.value.length > 32) {
+              event.currentTarget.value = event.currentTarget.value.slice(
+                0,
+                32
+              );
+            }
+          });
+
+          goPublicButton.addEventListener('click', (event) => {
+            start(roomNameInput.value);
+          });
+
+          roomNameInput.focus();
+        }
+
+        function nameChooser() {
+          let nameForm = document.querySelector('#name-form');
+          let nameInput = document.querySelector('#name-input');
+
+          nameForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (nameInput.value.length > 0) {
+              nameForm.remove();
+
+              zuckHouse.user.set({
+                name: nameInput.value,
+              });
+
+              roomChooser();
+            }
+          });
+
+          nameInput.addEventListener('input', (event) => {
+            if (event.currentTarget.value.length > 32) {
+              event.currentTarget.value = event.currentTarget.value.slice(
+                0,
+                32
+              );
+            }
+          });
+
+          nameInput.focus();
+        }
+
+        nameChooser();
+      }
+
+      window.onload = () => {
+        app();
+      };
+    </script>
+  <script src="/scripts/app.js"></script></body>
 </html>
