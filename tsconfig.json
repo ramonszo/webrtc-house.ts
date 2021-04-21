@@ -21,7 +21,8 @@
     "resolveJsonModule": true,
     "noEmitOnError": true,
     "rootDir": "./src",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "reactNamespace": "JSX"
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/*.spec.ts"]

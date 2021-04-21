@@ -6,6 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
+    />
     <style>
       #name-form {
         position: fixed;
@@ -237,7 +241,12 @@
           nameInput.focus();
         }
 
-        nameChooser();
+        // nameChooser();
+        document.querySelector(
+          '#name-form'
+        ).innerHTML = zuckHouse.components.Modal({
+          title: 'Vanilla title',
+        });
       }
 
       window.onload = () => {

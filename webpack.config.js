@@ -36,6 +36,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'src/index.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'index.react.html',
+      template: 'src/index.react.html'
     })
   ],
   devServer: {

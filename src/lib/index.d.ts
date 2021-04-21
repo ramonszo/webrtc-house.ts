@@ -64,4 +64,7 @@ export type Shrughouse = {
   user: {
     set: (values: Partial<ShrughouseData['user']>) => void;
   };
+  components: {
+    Modal: JSX
+  }
 };

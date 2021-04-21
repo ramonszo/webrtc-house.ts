@@ -1,4 +1,5 @@
 import SimplePeer from 'simple-peer';
+import Modal from '../components/Modal';
 import {
   Shrughouse,
   ShrughouseData,
@@ -392,6 +393,9 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
     room: {
       set: room.set,
       start: room.start
+    },
+    components: {
+      Modal
     }
   };
 }
@@ -401,3 +405,7 @@ if (typeof window !== 'undefined') {
 }
 
 export default Shrughouse;
+
+export {
+  Modal
+};
