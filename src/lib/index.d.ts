@@ -56,6 +56,13 @@ export type ShrughouseMediaData = {
   }
 };
 
+export type ShrughouseEvents = {
+  data: Array<() => void>;
+  'room:member': Array<() => void>;
+  'user:update': Array<() => void>;
+  'media:action': Array<() => void>;
+};
+
 export type Shrughouse = {
   room: {
     set: (values: Partial<ShrughouseData['room']>) => void;
@@ -66,5 +73,7 @@ export type Shrughouse = {
   };
   components: {
     Modal: JSX
-  }
+  },
+  events: ShrughouseEvents;
+  on: (eventName: keyof ShrughouseEvents, callback: () => void) => void;
 };

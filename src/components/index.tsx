@@ -1,5 +1,5 @@
 export const JSX = {
-  createElement (name: string, props: { [id: string]: string }, ...content: string[]): any {
+  createElement (name: string, props: { [id: string]: string }, ...content: HTMLElement[]): HTMLElement {
     const currentWindow = window as any;
 
     if (typeof currentWindow !== 'undefined' && currentWindow.React) {
@@ -8,7 +8,7 @@ export const JSX = {
 
     props = props || {};
 
-    const propsstr = Object.keys(props)
+    const propsStr = Object.keys(props)
       .map(key => {
         const value = props[key];
         if (key === 'className') return `class="${value}"`;
@@ -20,7 +20,14 @@ export const JSX = {
       })
       .join(' ');
 
-    return `<${name} ${propsstr}> ${content.join('')}</${name}>`;
+    const elementStr = `<${name} ${propsStr}>${content.map((contentElement) => {
+      return contentElement.outerHTML || contentElement;
+    }).join('')}</${name}>`;
+
+    const parentElement = document.createElement('div');
+    parentElement.innerHTML = elementStr;
+
+    return parentElement.firstElementChild as HTMLElement;
   }
 };
 

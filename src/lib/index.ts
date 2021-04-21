@@ -3,6 +3,7 @@ import Modal from '../components/Modal';
 import {
   Shrughouse,
   ShrughouseData,
+  ShrughouseEvents,
   ShrughouseMediaData,
   ShrughouseOptions,
   ShrughouseRoomMember,
@@ -24,6 +25,13 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
       members: []
     },
     streams: []
+  };
+
+  const events: ShrughouseEvents = {
+    data: [],
+    'room:member': [],
+    'user:update': [],
+    'media:action': []
   };
 
   const mediaData: ShrughouseMediaData = {
@@ -61,6 +69,10 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
   };
 
   const utils = {
+    addEventListener (event: keyof typeof events, callback: () => void) {
+      events[event].push(callback);
+    },
+
     updateData (callback: (data: ShrughouseData, oldData: ShrughouseData) => ShrughouseData) {
       const oldData = { ...data };
 
@@ -396,7 +408,9 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
     },
     components: {
       Modal
-    }
+    },
+    events: events,
+    on: utils.addEventListener
   };
 }
 
