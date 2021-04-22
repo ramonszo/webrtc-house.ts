@@ -1,38 +1,97 @@
-export const JSX = {
-  createElement(
-    name: string,
-    props: { [id: string]: string },
-    ...content: HTMLElement[]
-  ): HTMLElement {
-    const currentWindow = window as any;
+/*
+  This file translate the JSX component into an vanilla component.
+  Using this we can have the components available in multiple frameworks without duplicating them.
 
-    if (typeof currentWindow !== "undefined" && currentWindow.React) {
-      return currentWindow.React.createElement.apply(this, arguments);
+  Part of it come from: https://fettblog.eu/jsx-syntactic-sugar/
+*/
+
+type DOMProps = { [id: string]: string };
+type JSXFunction = (properties: DOMProps) => HTMLElement | string;
+
+// probably there's more tags/attributes on this list but the script only use those.
+const svgElements = ["svg", "path", "g", "d"];
+const camelCaseAttrs = {
+  className: "class",
+  strokeLinecap: "stroke-linecap",
+  strokeLinejoin: "stroke-linejoin",
+  strokeWidth: "stroke-width",
+};
+
+function DOMparseChildren(children: HTMLElement[]): HTMLElement[] {
+  return children.map((child: HTMLElement | string) => {
+    if (typeof child === "string") {
+      return document.createTextNode(child) as unknown;
     }
 
-    props = props || {};
+    return child;
+  }) as HTMLElement[];
+}
 
-    const propsStr = Object.keys(props)
-      .map((key) => {
-        const value = props[key];
-        if (key === "className") return `class="${value}"`;
-        if (key === "strokeLinecap") return `stroke-linecap="${value}"`;
-        if (key === "strokeLinejoin") return `stroke-linejoin="${value}"`;
-        if (key === "strokeWidth") return `stroke-width="${value}"`;
-        else return `${key}="${value}"`;
-      })
-      .join(" ");
+function nonNull(val: DOMProps): DOMProps {
+  return val || {};
+}
 
-    const elementStr = `<${name} ${propsStr}>${content
-      .map((contentElement) => {
-        return (contentElement && contentElement.outerHTML) || contentElement;
-      })
-      .join("")}</${name}>`;
+function DOMcreateElement(element: string): unknown {
+  if (svgElements.includes(element)) {
+    return document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      element
+    ) as unknown;
+  } else {
+    return document.createElement(element) as unknown;
+  }
+}
 
-    const parentElement = document.createElement("div");
-    parentElement.innerHTML = elementStr;
+function DOMparseNode(
+  element: string,
+  properties: DOMProps,
+  children: HTMLElement[]
+) {
+  const el = DOMcreateElement(element) as HTMLElement;
 
-    return parentElement.firstElementChild as HTMLElement;
+  Object.keys(nonNull(properties)).forEach((key: string) => {
+    if (Object.keys(camelCaseAttrs).includes(key)) {
+      el.setAttribute(
+        camelCaseAttrs[key as keyof typeof camelCaseAttrs],
+        properties[key]
+      );
+    } else if (typeof properties[key] !== "string") {
+      Object.defineProperty(el, key, properties[key]);
+    } else {
+      el.setAttribute(key, properties[key]);
+    }
+  });
+
+  DOMparseChildren(children).forEach((child: HTMLElement) => {
+    el.appendChild(child);
+  });
+
+  return el;
+}
+
+export const JSX = {
+  createElement(
+    element: unknown,
+    properties: DOMProps,
+    ...children: HTMLElement[]
+  ): HTMLElement | undefined {
+    const currentWindow = window as any;
+
+    // use React if available
+    if (typeof currentWindow !== "undefined" && currentWindow.React) {
+      return currentWindow.React.createElement.apply(this, arguments);
+    } else {
+      if (typeof element === "function") {
+        return element({
+          ...nonNull(properties),
+          children,
+        });
+      } else if (typeof element === "string") {
+        return DOMparseNode(element, properties, children);
+      } else {
+        return undefined;
+      }
+    }
   },
 };
 
