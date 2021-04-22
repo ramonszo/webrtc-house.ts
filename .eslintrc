@@ -2,7 +2,9 @@
   "extends": [
     "semistandard",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:prettier/recommended"
   ],
   "globals": {
     "chrome": true
@@ -33,5 +35,5 @@
     }
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint/eslint-plugin"]
+  "plugins": ["prettier", "@typescript-eslint", "react"]
 }

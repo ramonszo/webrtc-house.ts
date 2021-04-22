@@ -1,39 +1,12 @@
-
-import JSX from './index';
+import JSX from "../lib/jsx";
+import Header from "./Room/Header";
 
 export default ({ title }: { title?: string }) => {
   return (
-    <div
-      className="m-auto w-full fixed bottom-0 pt-12 max-h-screen font-sans flex justify-center"
-    >
-      <div
-        className="flex flex-col w-full sm:max-w-md bg-white rounded-t-3xl shadow relative overflow-hidden"
-      >
+    <div className="m-auto w-full fixed bottom-0 pt-12 max-h-screen font-sans flex justify-center">
+      <div className="flex flex-col w-full sm:max-w-md bg-white rounded-t-3xl shadow relative overflow-hidden">
         <div className="overflow-auto">
-          <header className="flex px-6 pt-3 pb-0">
-            <h1 className="flex-grow font-semibold">
-              {title}
-            </h1>
-
-            <div className="flex-shrink pl-3">
-              <button className="p-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </header>
+          <Header title={title} />
 
           <section>
             <div className="grid gap-4 grid-cols-3 py-3 px-6">
@@ -43,9 +16,7 @@ export default ({ title }: { title?: string }) => {
                     className="w-full h-full object-cover rounded-full border border-opacity-50"
                     src="https://pbs.twimg.com/profile_images/1382545718385201152/94Vtgqyo_400x400.jpg"
                   />
-                  <div
-                    className="absolute right-0 bottom-0 -mr-1 -mb-1 p-1 bg-white border border-opacity-50 rounded-full"
-                  >
+                  <div className="absolute right-0 bottom-0 -mr-1 -mb-1 p-1 bg-white border border-opacity-50 rounded-full">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-6 w-6"
@@ -62,9 +33,9 @@ export default ({ title }: { title?: string }) => {
                     </svg>
                   </div>
                 </div>
-                <span className="truncate max-w-full text-sm"
-                  >✳️ Name Name Name</span
-                >
+                <span className="truncate max-w-full text-sm">
+                  ✳️ Name Name Name
+                </span>
               </div>
               <div className="flex flex-col items-center overflow-hidden p-2">
                 <div className="rounded-full bg-gray-200 w-20 h-20 mb-2 relative">
@@ -72,9 +43,7 @@ export default ({ title }: { title?: string }) => {
                     className="w-full h-full object-cover rounded-full border border-opacity-50"
                     src="https://pbs.twimg.com/profile_images/1382943335661273089/Y9jD7y1l_400x400.jpg"
                   />
-                  <div
-                    className="absolute right-0 bottom-0 -mr-1 -mb-1 p-1 bg-white border border-opacity-50 rounded-full"
-                  >
+                  <div className="absolute right-0 bottom-0 -mr-1 -mb-1 p-1 bg-white border border-opacity-50 rounded-full">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-6 w-6 absolute transform rotate-45"
@@ -166,48 +135,34 @@ export default ({ title }: { title?: string }) => {
             </h2>
             <div className="grid gap-4 grid-cols-4 py-3 px-6">
               <div className="flex flex-col items-center overflow-hidden p-2">
-                <div
-                  className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"
-                ></div>
+                <div className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"></div>
                 <span className="truncate max-w-full text-sm">Name</span>
               </div>
               <div className="flex flex-col items-center overflow-hidden p-2">
-                <div
-                  className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"
-                ></div>
+                <div className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"></div>
                 <span className="truncate max-w-full text-sm">Name</span>
               </div>
               <div className="flex flex-col items-center overflow-hidden p-2">
-                <div
-                  className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"
-                ></div>
+                <div className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"></div>
                 <span className="truncate max-w-full text-sm">Name</span>
               </div>
               <div className="flex flex-col items-center overflow-hidden p-2">
-                <div
-                  className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"
-                ></div>
+                <div className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"></div>
                 <span className="truncate max-w-full text-sm">Name</span>
               </div>
               <div className="flex flex-col items-center overflow-hidden p-2">
-                <div
-                  className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"
-                ></div>
+                <div className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"></div>
                 <span className="truncate max-w-full text-sm">Name</span>
               </div>
               <div className="flex flex-col items-center overflow-hidden p-2">
-                <div
-                  className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"
-                ></div>
+                <div className="rounded-full bg-gray-200 w-16 h-16 mb-2 relative"></div>
                 <span className="truncate max-w-full text-sm">Name</span>
               </div>
             </div>
           </section>
         </div>
 
-        <footer
-          className="bottom-0 m-auto px-6 py-3 flex items-center justify-between sm:max-w-md w-full bg-white"
-        >
+        <footer className="bottom-0 m-auto px-6 py-3 flex items-center justify-between sm:max-w-md w-full bg-white">
           <div className="flex flex-row-reverse mr-4">
             <img
               className="w-8 h-8 object-cover rounded-full ring-2 ring-white -mr-1"
@@ -231,17 +186,15 @@ export default ({ title }: { title?: string }) => {
             />
           </div>
 
-          <button
-            className="rounded-full bg-gray-200 py-2 px-4 h-10 flex items-center whitespace-nowrap mr-4"
-          >
+          <button className="rounded-full bg-gray-200 py-2 px-4 h-10 flex items-center whitespace-nowrap mr-4">
             <span className="mt-0.5">✌️</span>
-            <span className="text-red-400 ml-2 text-sm font-semibold">Leave quietly</span>
+            <span className="text-red-400 ml-2 text-sm font-semibold">
+              Leave quietly
+            </span>
           </button>
 
           <div className="flex items-center">
-            <button
-              className="rounded-full bg-gray-200 p-2 h-10 w-10 justify-center mr-4 flex items-center"
-            >
+            <button className="rounded-full bg-gray-200 p-2 h-10 w-10 justify-center mr-4 flex items-center">
               ✌️
             </button>
 
