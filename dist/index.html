@@ -105,62 +105,65 @@
 
     <script>
       function app() {
-        const zuckHouse = Shrughouse({
-          state(data, oldData) {
-            const videos = document.querySelector('#videos');
-            const currentStreams = [];
+        const zuckHouse = Shrughouse();
 
-            const createVideo = (id, src) => {
-              if (!document.querySelector(`#${id}`)) {
-                let newVid = document.createElement('video');
+        const createVideo = (id, src) => {
+          if (!document.querySelector(`#${id}`)) {
+            let newVid = document.createElement('video');
 
-                newVid.srcObject = src;
-                newVid.id = id;
-                newVid.playsinline = false;
-                newVid.autoplay = true;
-                newVid.className = 'vid';
+            newVid.srcObject = src;
+            newVid.id = id;
+            newVid.playsinline = false;
+            newVid.autoplay = true;
+            newVid.className = 'vid';
 
-                if (id === 'user') {
-                  newVid.muted = true;
-                }
+            if (id === 'user') {
+              newVid.muted = true;
+            }
 
-                videos.appendChild(newVid);
-              }
-            };
+            videos.appendChild(newVid);
+          }
+        };
 
-            const removeVideo = (id) => {
-              const videoEl = document.querySelector(`#${id}`);
+        const removeVideo = (id) => {
+          const videoEl = document.querySelector(`#${id}`);
 
-              if (videoEl) {
-                const tracks = videoEl.srcObject.getTracks();
+          if (videoEl) {
+            const tracks = videoEl.srcObject.getTracks();
 
-                tracks.forEach(function (track) {
-                  track.stop();
-                });
+            tracks.forEach(function (track) {
+              track.stop();
+            });
 
-                videoEl.srcObject = null;
-                videoEl.parentNode.removeChild(videoEl);
-              }
-            };
+            videoEl.srcObject = null;
+            videoEl.parentNode.removeChild(videoEl);
+          }
+        };
 
-            if (data.user.stream) {
-              createVideo('user', data.user.stream);
+        zuckHouse.on('user', function (event) {
+          const type = event.type;
+          const user = event.detail;
+
+          if (type === 'update') {
+            if (user.stream) {
+              createVideo('user', user.stream);
             } else {
               removeVideo('user');
             }
+          }
+        });
 
-            data.streams.forEach((stream) => {
-              currentStreams.push(stream.id);
+        zuckHouse.on('media', function (event) {
+          const type = event.type;
+          const stream = event.detail;
 
-              createVideo(`stream-${stream.id}`, stream.stream);
-            });
+          const videos = document.querySelector('#videos');
 
-            oldData.streams.forEach((stream) => {
-              if (currentStreams.indexOf(stream.id) === -1) {
-                removeVideo(`stream-${stream.id}`);
-              }
-            });
-          },
+          if (type === 'add') {
+            createVideo(`stream-${stream.id}`, stream.stream);
+          } else {
+            removeVideo(`stream-${stream.id}`);
+          }
         });
 
         function roomChooser() {
@@ -241,12 +244,15 @@
           nameInput.focus();
         }
 
-        // nameChooser();
+        nameChooser();
+
+        /*
         document.querySelector('#name-form').appendChild(
           zuckHouse.components.Modal({
             title: 'Vanilla title',
           })
         );
+        */
       }
 
       window.onload = () => {

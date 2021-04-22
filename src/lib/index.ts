@@ -5,16 +5,15 @@ import {
   ShrughouseData,
   ShrughouseEvents,
   ShrughouseMediaData,
-  ShrughouseOptions,
+  ShrughouseMediaStream,
   ShrughouseRoomMember,
-  ShrughouseStream,
   ShrughouseWebSocket,
   ShrughouseWebSocketEvent,
   ShrughouseWebSocketId,
   ShrughouseWebSocketMessage
 } from './index.d';
 
-function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
+function Shrughouse (): Shrughouse {
   let data: ShrughouseData = {
     user: {
       name: undefined,
@@ -27,11 +26,27 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
     streams: []
   };
 
+  const configuration = {
+    hostname: 'chat-beta.r-corp.workers.dev',
+    iceServers: [
+      {
+        urls: 'stun:stun.l.google.com:19302'
+      },
+      {
+        url: 'turn:192.158.29.39:3478?transport=udp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+      }
+    ]
+  };
+
   const events: ShrughouseEvents = {
     data: [],
+    user: [],
+    room: [],
     'room:member': [],
-    'user:update': [],
-    'media:action': []
+    media: [],
+    error: []
   };
 
   const mediaData: ShrughouseMediaData = {
@@ -53,24 +68,18 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
     }
   };
 
-  const configuration = {
-    hostname: 'chat-beta.r-corp.workers.dev',
-    iceServers: [
-      {
-        urls: 'stun:stun.l.google.com:19302'
-      },
-      {
-        url: 'turn:192.158.29.39:3478?transport=udp',
-        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        username: '28224511:1379330808'
-      }
-    ],
-    ...options
-  };
-
   const utils = {
-    addEventListener (event: keyof typeof events, callback: () => void) {
-      events[event].push(callback);
+    addEventListener (
+      eventName: keyof ShrughouseEvents,
+      callback: (event: ShrughouseEvents[keyof ShrughouseEvents]
+    ) => void) {
+      events[eventName].push(callback);
+    },
+
+    execEventListeners (eventName: keyof ShrughouseEvents, details: unknown) {
+      events[eventName].forEach((eventFunc: (details: unknown) => void) => {
+        eventFunc(details);
+      });
     },
 
     updateData (callback: (data: ShrughouseData, oldData: ShrughouseData) => ShrughouseData) {
@@ -78,9 +87,7 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
 
       data = callback(data, oldData);
 
-      if (options.state) {
-        options.state(data, oldData);
-      }
+      utils.execEventListeners('data', { type: 'update', detail: data });
     }
   };
 
@@ -92,6 +99,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
           utils.updateData((newData) => {
             newData.user.stream = stream;
 
+            utils.execEventListeners('user', { type: 'update', detail: newData.user });
+
             return newData;
           });
 
@@ -100,9 +109,7 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
           callback();
         })
         .catch((e) => {
-          alert(`getusermedia error ${e.name}`);
-
-          console.log('error', e);
+          utils.execEventListeners('error', { message: `getUserMedia error: ${e.name}` });
         });
     },
 
@@ -111,7 +118,6 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         const eventData = JSON.parse(event.data) as ShrughouseWebSocketMessage;
 
         if (eventData.media === 'initReceive') {
-          console.log('INIT RECEIVE ' + eventData.socketId);
           media.addPeer(socket, eventData.socketId, false);
 
           socket.send(
@@ -121,10 +127,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
             })
           );
         } else if (eventData.media === 'initSend') {
-          console.log('INIT SEND ' + eventData.socketId);
           media.addPeer(socket, eventData.socketId, true);
         } else if (eventData.media === 'removePeer') {
-          console.log('REMOVE PEER ' + eventData.socketId);
           media.removePeer(eventData.socketId);
         } else if (eventData.media === 'signal') {
           mediaData.peers[eventData.socketId].signal(eventData.signal);
@@ -132,8 +136,6 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
       });
 
       socket.addEventListener('close', () => {
-        console.log('GOT DISCONNECTED');
-
         Object.keys(mediaData.peers).forEach((socketId) => {
           media.removePeer(socketId);
         });
@@ -142,9 +144,21 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
 
     removePeer (socketId: ShrughouseWebSocketId) {
       utils.updateData((newData, oldData) => {
+        let currentStream;
+
         newData.streams = oldData.streams.filter(
-          (oldStream) => oldStream.id !== socketId
+          (oldStream) => {
+            const result = oldStream.id !== socketId;
+
+            if (!result) {
+              currentStream = oldStream;
+            }
+
+            return result;
+          }
         );
+
+        utils.execEventListeners('media', { type: 'remove', detail: currentStream });
 
         return newData;
       });
@@ -172,12 +186,16 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         );
       });
 
-      mediaData.peers[socketId].on('stream', (stream: ShrughouseStream) => {
+      mediaData.peers[socketId].on('stream', (stream: ShrughouseMediaStream) => {
         utils.updateData((newData) => {
-          newData.streams.push({
+          const currentStream = {
             id: socketId,
             stream
-          });
+          };
+
+          newData.streams.push(currentStream);
+
+          utils.execEventListeners('media', { type: 'add', detail: currentStream });
 
           return newData;
         });
@@ -209,6 +227,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         utils.updateData((newData) => {
           newData.user.stream = undefined;
 
+          utils.execEventListeners('user', { type: 'update', detail: newData.user });
+
           return newData;
         });
       }
@@ -236,6 +256,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         utils.updateData((newData) => {
           newData.user.stream = stream;
 
+          utils.execEventListeners('user', { type: 'update', detail: newData.user });
+
           return newData;
         });
       });
@@ -252,6 +274,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         utils.updateData((newData) => {
           newData.user.stream = undefined;
 
+          utils.execEventListeners('user', { type: 'update', detail: newData.user });
+
           return newData;
         });
       }
@@ -267,6 +291,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
       utils.updateData((newData) => {
         newData.user = values as ShrughouseData['user'];
 
+        utils.execEventListeners('user', { type: 'update', detail: newData.user });
+
         return newData;
       });
     }
@@ -281,7 +307,7 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
           .toLowerCase();
 
         if (values.name.length > 32 && !values.name.match(/^[0-9a-f]{64}$/)) {
-          console.warn('ERROR', 'Invalid room name.');
+          utils.execEventListeners('error', { message: 'Invalid room name' });
           return;
         }
       }
@@ -291,6 +317,8 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
           ...oldData.room,
           ...values
         };
+
+        utils.execEventListeners('room', { type: 'update', detail: newData.room });
 
         return newData;
       });
@@ -304,15 +332,31 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
 
         newData.room.members.push(member);
 
+        utils.execEventListeners('room:member', { type: 'add', detail: member });
+        utils.execEventListeners('room', { type: 'update', detail: newData.room });
+
         return newData;
       });
     },
 
     removeMember (member: ShrughouseRoomMember) {
       utils.updateData((newData, oldData) => {
+        let currentMember;
+
         newData.room.members = oldData.room.members.filter(
-          (oldMember) => oldMember.id !== member.id
+          (oldMember) => {
+            const result = oldMember.id !== member.id;
+
+            if (!result) {
+              currentMember = oldMember;
+            }
+
+            return result;
+          }
         );
+
+        utils.execEventListeners('room:member', { type: 'remove', detail: currentMember });
+        utils.execEventListeners('room', { type: 'update', detail: newData.room });
 
         return newData;
       });
@@ -366,7 +410,7 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
         const eventData = JSON.parse(event.data);
 
         if (eventData.error) {
-          console.log('error', eventData.error);
+          utils.execEventListeners('error', { message: eventData.error });
         } else if (eventData.joined) {
           room.addMember({
             id: eventData.socketId
@@ -381,16 +425,14 @@ function Shrughouse (options: ShrughouseOptions = {}): Shrughouse {
       });
 
       ws.addEventListener('close', (event) => {
-        console.log(
-          'WebSocket closed, reconnecting:',
-          event.code,
-          event.reason
-        );
+        utils.execEventListeners('error', { message: event.reason });
+
         rejoin();
       });
 
       ws.addEventListener('error', (event) => {
-        console.log('WebSocket error, reconnecting:', event);
+        utils.execEventListeners('error', { message: 'Websocket error', data: event });
+
         rejoin();
       });
 
@@ -421,5 +463,6 @@ if (typeof window !== 'undefined') {
 export default Shrughouse;
 
 export {
+  Shrughouse,
   Modal
 };

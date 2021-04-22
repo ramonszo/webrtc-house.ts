@@ -1,27 +1,27 @@
-export type ShrughouseStream = MediaStream;
+export type ShrughouseMediaStream = MediaStream;
 
 export type ShrughouseRoomMember = {
   id: string
 };
 
-export type ShrughouseData = {
-  user: {
-    name: string | undefined,
-    stream: ShrughouseStream | undefined
-  },
-  room: {
-    name: string | undefined,
-    members: ShrughouseRoomMember[]
-  },
-  streams: {
-    id: string;
-    stream: ShrughouseStream
-  }[]
+export type ShrughouseRoom = {
+  name: string | undefined,
+  members: ShrughouseRoomMember[]
 };
 
-export type ShrughouseOptions = {
-  state?: (data: ShrughouseData, oldData: ShrughouseData) => void;
-}
+export type ShrughouseUser = {
+  name: string | undefined,
+  stream: ShrughouseMediaStream | undefined
+};
+
+export type ShrughouseData = {
+  user: ShrughouseUser,
+  room: ShrughouseRoom,
+  streams: {
+    id: string;
+    stream: ShrughouseMediaStream
+  }[]
+};
 
 export type ShrughouseWebSocket = Websocket;
 
@@ -39,7 +39,7 @@ export type ShrughouseMediaData = {
   peers: {
     [keyname: string]: SimplePeer.Instance;
   },
-  localStream: undefined | ShrughouseStream,
+  localStream: undefined | ShrughouseMediaStream,
   constraints: {
     audio: boolean,
     video: {
@@ -56,11 +56,18 @@ export type ShrughouseMediaData = {
   }
 };
 
+export type ShrughouseEvent<EventData> = (eventData: {
+  type?: 'update' | 'add' | 'remove';
+  details: EventData;
+}) => void;
+
 export type ShrughouseEvents = {
-  data: Array<() => void>;
-  'room:member': Array<() => void>;
-  'user:update': Array<() => void>;
-  'media:action': Array<() => void>;
+  data: ShrughouseEvent<ShrughouseData>[];
+  room: ShrughouseEvent<ShrughouseRoom>[];
+  'room:member': ShrughouseEvent<ShrughouseRoomMember>[];
+  user: ShrughouseEvent<ShrughouseUser>[];
+  media: ShrughouseEvent<ShrughouseMediaStream>[];
+  error: ShrughouseEvents<{ message: string }>[]
 };
 
 export type Shrughouse = {
