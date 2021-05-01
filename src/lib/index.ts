@@ -13,7 +13,25 @@ import {
   ShrughouseWebSocketMessage,
 } from "./index.d";
 
-function Shrughouse(): Shrughouse {
+const ShrughouseOptions = {
+  hostname: "chat-beta.r-corp.workers.dev",
+  iceServers: [
+    {
+      urls: "stun:stun.l.google.com:19302",
+    },
+    {
+      url: "turn:192.158.29.39:3478?transport=udp",
+      credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+      username: "28224511:1379330808",
+    },
+  ],
+};
+
+function Shrughouse(
+  options: Partial<typeof ShrughouseOptions> = {}
+): Shrughouse {
+  const currentOptions = { ...ShrughouseOptions, ...options };
+
   let data: ShrughouseData = {
     user: {
       name: undefined,
@@ -24,20 +42,6 @@ function Shrughouse(): Shrughouse {
       members: [],
     },
     streams: [],
-  };
-
-  const configuration = {
-    hostname: "chat-beta.r-corp.workers.dev",
-    iceServers: [
-      {
-        urls: "stun:stun.l.google.com:19302",
-      },
-      {
-        url: "turn:192.158.29.39:3478?transport=udp",
-        credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
-        username: "28224511:1379330808",
-      },
-    ],
   };
 
   const events: ShrughouseEvents = {
@@ -188,7 +192,7 @@ function Shrughouse(): Shrughouse {
       mediaData.peers[socketId] = new SimplePeer({
         initiator: initiator,
         stream: mediaData.localStream,
-        config: configuration,
+        config: currentOptions,
       });
 
       mediaData.peers[socketId].on(
@@ -426,7 +430,7 @@ function Shrughouse(): Shrughouse {
     join() {
       const ws = new WebSocket(
         "wss://" +
-          configuration.hostname +
+          currentOptions.hostname +
           "/api/room/" +
           data.room.name +
           "/websocket"
