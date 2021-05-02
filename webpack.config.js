@@ -1,52 +1,52 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: 'development',
+  mode: "development",
   watch: true,
-  entry: ['./src/lib/index.ts'],
-  devtool: 'inline-source-map',
+  entry: ["./src/lib/index.ts"],
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
         test: /\.(js)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ["babel-loader"],
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
-      }
-    ]
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+    ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: [".tsx", ".ts", ".js"],
   },
   output: {
     path: `${path.resolve(__dirname)}/dist`,
-    publicPath: '/',
-    filename: 'scripts/app.js'
+    publicPath: "/",
+    filename: "scripts/app.js",
   },
   plugins: [
     new webpack.DefinePlugin({
-      __DEV__: true
+      __DEV__: true,
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: 'src/index.html'
+      filename: "index.html",
+      template: "src/index.html",
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.react.html',
-      template: 'src/index.react.html'
-    })
+      filename: "index.react.html",
+      template: "src/index.react.html",
+    }),
   ],
   devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
+    contentBase: path.resolve(__dirname, "dist"),
     liveReload: true,
-    port: 9000,
+    port: 3000,
     historyApiFallback: true,
-    writeToDisk: true
-  }
+    writeToDisk: true,
+  },
 };

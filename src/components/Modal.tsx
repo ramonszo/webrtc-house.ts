@@ -3,7 +3,7 @@ import Header from "./Room/Header";
 
 export default ({ title }: { title?: string }) => {
   return (
-    <div className="m-auto w-full fixed bottom-0 pt-12 max-h-screen font-sans flex justify-center">
+    <div className="hidden m-auto w-full fixed bottom-0 pt-12 max-h-screen font-sans flex justify-center">
       <div className="flex flex-col w-full sm:max-w-md bg-white rounded-t-3xl shadow relative overflow-hidden">
         <div className="overflow-auto">
           <Header title={title} />

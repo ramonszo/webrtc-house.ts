@@ -12,8 +12,8 @@
     />
     <style>
       #name-form {
+        display: none;
         position: fixed;
-        z-index: 3;
         top: 0;
         bottom: 0;
         left: 0;
@@ -41,8 +41,8 @@
       }
 
       #room-form {
+        display: none;
         position: fixed;
-        z-index: 2;
         top: 0;
         bottom: 0;
         left: 0;
@@ -68,6 +68,10 @@
         height: 2em;
       }
 
+      #room {
+        display: none;
+      }
+
       #go-public {
         width: 4em;
       }
@@ -86,15 +90,15 @@
     </style>
   </head>
   <body>
-    <form id="name-form">
-      <input id="name-input" placeholder="your name" />
-    </form>
-
     <form id="room-form">
       <p>Enter a public room:</p>
       <input id="room-name" placeholder="room name" /><button id="go-public">
         Go &raquo;
       </button>
+    </form>
+
+    <form id="name-form">
+      <input id="name-input" placeholder="your name" />
     </form>
 
     <form id="room">
@@ -166,29 +170,37 @@
           }
         });
 
+        function startRoom(name) {
+          let room = document.querySelector('#room');
+
+          if (name.length > 0) {
+            zuckHouse.room.set({
+              name: name,
+            });
+
+            zuckHouse.room.start();
+
+            room.style.display = 'block';
+          }
+        }
+
         function roomChooser() {
           let roomForm = document.querySelector('#room-form');
           let roomNameInput = document.querySelector('#room-name');
           let goPublicButton = document.querySelector('#go-public');
           let goPrivateButton = document.querySelector('#go-private');
 
-          const start = (name) => {
-            let roomForm = document.querySelector('#room-form');
-            roomForm.remove();
+          roomForm.style.display = 'block';
 
-            if (name.length > 0) {
-              zuckHouse.room.set({
-                name: name,
-              });
+          const showNameChooser = (name) => {
+            roomForm.style.display = 'none';
 
-              document.location.hash = name;
-
-              zuckHouse.room.start();
-            }
+            document.location.hash = name;
+            nameChooser(name);
           };
 
           if (document.location.hash.length > 1) {
-            start(document.location.hash.slice(1));
+            showNameChooser(document.location.hash.slice(1));
 
             return;
           }
@@ -196,7 +208,7 @@
           roomForm.addEventListener('submit', (event) => {
             event.preventDefault();
 
-            start(roomNameInput.value);
+            showNameChooser(roomNameInput.value);
           });
 
           roomNameInput.addEventListener('input', (event) => {
@@ -209,26 +221,28 @@
           });
 
           goPublicButton.addEventListener('click', (event) => {
-            start(roomNameInput.value);
+            showNameChooser(roomNameInput.value);
           });
 
           roomNameInput.focus();
         }
 
-        function nameChooser() {
+        function nameChooser(roomName) {
           let nameForm = document.querySelector('#name-form');
           let nameInput = document.querySelector('#name-input');
 
+          nameForm.style.display = 'block';
+
           nameForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            if (nameInput.value.length > 0) {
-              nameForm.remove();
 
+            if (nameInput.value.length > 0) {
               zuckHouse.user.set({
                 name: nameInput.value,
               });
 
-              roomChooser();
+              nameForm.style.display = 'none';
+              startRoom(roomName);
             }
           });
 
@@ -244,7 +258,7 @@
           nameInput.focus();
         }
 
-        nameChooser();
+        roomChooser();
 
         document.querySelector('#name-form').appendChild(
           zuckHouse.components.Modal({
