@@ -11,6 +11,11 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
     />
     <style>
+      #vanilla-root {
+        position: relative;
+        z-index: 10;
+      }
+
       #name-form {
         display: none;
         position: fixed;
@@ -90,6 +95,8 @@
     </style>
   </head>
   <body>
+    <div id="vanilla-root"></div>
+
     <form id="room-form">
       <p>Enter a public room:</p>
       <input id="room-name" placeholder="room name" /><button id="go-public">
@@ -174,6 +181,10 @@
           } else {
             // mute
           }
+        });
+
+        zuckHouse.on('room:member', function (event) {
+          console.log('room member', event);
         });
 
         function startRoom(name) {
@@ -266,8 +277,8 @@
 
         roomChooser();
 
-        document.querySelector('#name-form').appendChild(
-          zuckHouse.components.Modal({
+        document.querySelector('#vanilla-root').appendChild(
+          zuckHouse.components.Panel({
             title: 'Vanilla title',
           })
         );

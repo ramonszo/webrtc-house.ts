@@ -6,7 +6,7 @@ import User from "./User";
 import Room from "./Room";
 import Utils from "./Utils";
 
-import Modal from "../components/Modal";
+import Panel from "../components/Panel";
 
 function Shrughouse(
   customOptions: Partial<typeof ShrughouseOptions> = {}
@@ -48,7 +48,7 @@ function Shrughouse(
       start: room.start,
     },
     components: {
-      Modal,
+      Panel,
     },
     events: events,
     on: utils.addEventListener,
@@ -61,4 +61,4 @@ if (typeof window !== "undefined") {
 
 export default Shrughouse;
 
-export { Shrughouse, Modal };
+export { Shrughouse, Panel };

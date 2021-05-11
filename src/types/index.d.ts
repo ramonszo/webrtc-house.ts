@@ -41,7 +41,7 @@ export type Shrughouse = {
     set: (values: Partial<ShrughouseData["user"]>) => void;
   };
   components: {
-    Modal: JSX;
+    Panel: JSX;
   };
   events: ShrughouseEvents;
   on: (eventName: keyof ShrughouseEvents, callback: () => void) => void;
