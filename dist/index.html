@@ -111,9 +111,9 @@
       function app() {
         const zuckHouse = Shrughouse();
 
-        const createVideo = (id, src) => {
+        const createMedia = (id, type, src) => {
           if (!document.querySelector(`#${id}`)) {
-            let newVid = document.createElement('video');
+            let newVid = document.createElement(type);
 
             newVid.srcObject = src;
             newVid.id = id;
@@ -129,7 +129,7 @@
           }
         };
 
-        const removeVideo = (id) => {
+        const removeMedia = (id) => {
           const videoEl = document.querySelector(`#${id}`);
 
           if (videoEl) {
@@ -150,9 +150,9 @@
 
           if (type === 'update') {
             if (user.stream) {
-              createVideo('user', user.stream);
+              createMedia('user', user.streamType, user.stream);
             } else {
-              removeVideo('user');
+              removeMedia('user');
             }
           }
         });
@@ -164,9 +164,15 @@
           const videos = document.querySelector('#videos');
 
           if (type === 'add') {
-            createVideo(`stream-${stream.id}`, stream.stream);
+            createMedia(
+              `stream-${stream.id}`,
+              stream.streamType,
+              stream.stream
+            );
+          } else if (type === 'remove') {
+            removeMedia(`stream-${stream.id}`);
           } else {
-            removeVideo(`stream-${stream.id}`);
+            // mute
           }
         });
 

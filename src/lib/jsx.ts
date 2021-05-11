@@ -62,9 +62,17 @@ function DOMparseNode(
     }
   });
 
-  DOMparseChildren(children).forEach((child: HTMLElement) => {
-    el.appendChild(child);
-  });
+  const parseChild = (childrenArray: HTMLElement | HTMLElement[]) => {
+    if (Array.isArray(childrenArray)) {
+      DOMparseChildren(childrenArray).forEach((child: HTMLElement) => {
+        parseChild(child);
+      });
+    } else if (childrenArray) {
+      el.appendChild(childrenArray);
+    }
+  };
+
+  parseChild(children);
 
   return el;
 }

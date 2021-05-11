@@ -1,4 +1,4 @@
-import JSX from "../../lib/jsx";
+import JSX from "../../lib/JSX";
 
 export default ({ title }: { title?: string }) => {
   return (

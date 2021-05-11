@@ -43,6 +43,7 @@ module.exports = {
     }),
   ],
   devServer: {
+    disableHostCheck: true,
     contentBase: path.resolve(__dirname, "dist"),
     liveReload: true,
     port: 3000,

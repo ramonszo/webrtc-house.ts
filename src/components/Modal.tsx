@@ -1,4 +1,4 @@
-import JSX from "../lib/jsx";
+import JSX from "../lib/JSX";
 import Header from "./Room/Header";
 
 export default ({ title }: { title?: string }) => {
@@ -41,7 +41,7 @@ export default ({ title }: { title?: string }) => {
                 <div className="rounded-full bg-gray-200 w-20 h-20 mb-2 relative">
                   <img
                     className="w-full h-full object-cover rounded-full border border-opacity-50"
-                    src="https://pbs.twimg.com/profile_images/1382943335661273089/Y9jD7y1l_400x400.jpg"
+                    src="https://1.gravatar.com/avatar/767fc9c115a1b989744c755db47feb60?s=200"
                   />
                   <div className="absolute right-0 bottom-0 -mr-1 -mb-1 p-1 bg-white border border-opacity-50 rounded-full">
                     <svg
