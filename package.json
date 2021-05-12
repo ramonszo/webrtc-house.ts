@@ -17,6 +17,7 @@
     "@typescript-eslint/parser": "4.22.0",
     "babel-eslint": "9.0.0",
     "babel-loader": "8.2.2",
+    "concurrently": "^6.1.0",
     "eslint": "^7.24.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "8.2.0",
@@ -41,13 +42,19 @@
     "webpack-dev-server": "3.11.2"
   },
   "scripts": {
+    "server": "node ./server.js",
+    "server:dev": "webpack-dev-server",
     "watch": "webpack --config ./webpack.config.js --mode development",
-    "dev": "webpack-dev-server",
+    "dev": "./node_modules/.bin/concurrently --kill-others \"npm run server\" \"npm run server:dev\"",
     "build": "webpack --config ./webpack.prod.js --mode production"
   },
   "author": "Ramon Souza <https://ramon82.com>",
   "license": "MIT",
   "dependencies": {
-    "simple-peer": "^9.7.0"
+    "express": "^4.17.1",
+    "httpolyglot": "^0.1.2",
+    "simple-peer": "^9.7.0",
+    "socket.io": "^4.1.1",
+    "socket.io-client": "^4.1.1"
   }
 }

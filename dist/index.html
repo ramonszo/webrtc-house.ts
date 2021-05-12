@@ -120,7 +120,7 @@
 
         const createMedia = (id, type, src) => {
           if (!document.querySelector(`#${id}`)) {
-            let newVid = document.createElement(type);
+            let newVid = document.createElement(type || 'video');
 
             newVid.srcObject = src;
             newVid.id = id;

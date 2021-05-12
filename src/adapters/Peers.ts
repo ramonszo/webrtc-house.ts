@@ -1,15 +1,13 @@
 import SimplePeer from "simple-peer";
+import { io } from "socket.io-client";
 
 import {
   ShrughouseData,
   ShrughouseAdapterPeersData,
   ShrughouseMediaStream,
   ShrughouseWebSocket,
-  ShrughouseWebSocketEvent,
   ShrughouseWebSocketId,
-  ShrughouseWebSocketMessage,
   ShrughouseAdapterProps,
-  ShrughouseRoomMember,
 } from "../types";
 
 import Utils from "../lib/Utils";
@@ -44,7 +42,7 @@ export default function AdapterPeers({
   };
 
   const p2p = {
-    initMediaSender(callback: () => void): void {
+    initMedia(callback: () => void): void {
       navigator.mediaDevices
         .getUserMedia(p2pData.constraints)
         .then((stream) => {
@@ -70,107 +68,48 @@ export default function AdapterPeers({
         });
     },
 
-    initMediaReceiver(socket: ShrughouseWebSocket): void {
-      socket.addEventListener("message", (event: ShrughouseWebSocketEvent) => {
-        const eventData = JSON.parse(event.data) as ShrughouseWebSocketMessage;
+    initSocket(): void {
+      const ws = io(
+        (location.protocol === "https:" ? "wss" : "ws") + "://" + options.api,
+        { query: { room: data.room.name, user: data.user.name } }
+      );
 
-        if (eventData.media === "initReceive") {
-          p2p.add(socket, eventData.socketId, false);
+      ws.on("initReceive", (data: { socketId: string; user: string }) => {
+        const { socketId, user } = data;
 
-          socket.send(
-            JSON.stringify({
-              media: "initSend",
-              socketId: eventData.socketId,
-            })
-          );
-        } else if (eventData.media === "initSend") {
-          p2p.add(socket, eventData.socketId, true);
-        } else if (eventData.media === "remove") {
-          p2p.remove(eventData.socketId);
-        } else if (eventData.media === "signal") {
-          p2pData.peers[eventData.socketId].signal(eventData.signal);
-        }
+        p2p.add(ws, socketId, false);
+
+        room.addMember({
+          id: data.socketId,
+          name: user,
+        });
+
+        ws.emit("initSend", { socketId: socketId });
       });
 
-      socket.addEventListener("close", () => {
-        Object.keys(p2pData.peers).forEach((socketId) => {
+      ws.on("initSend", (data: { socketId: string }) => {
+        const { socketId } = data;
+
+        p2p.add(ws, socketId, true);
+      });
+
+      ws.on("removePeer", (socketId: string) => {
+        p2p.remove(socketId);
+
+        room.removeMember({
+          id: socketId,
+        });
+      });
+
+      ws.on("disconnect", () => {
+        Object.keys(p2pData.peers).forEach((socketId: string) => {
           p2p.remove(socketId);
         });
       });
-    },
 
-    initSocket(): void {
-      const ws = new WebSocket(
-        (location.protocol === "https:" ? "wss" : "ws") +
-          "://" +
-          options.api +
-          "/api/room/" +
-          data.room.name +
-          "/websocket"
-      );
-
-      let rejoined = false;
-      const startTime = Date.now();
-
-      const rejoin = async () => {
-        if (!rejoined) {
-          rejoined = true;
-
-          data.room.members.forEach((memberData: ShrughouseRoomMember) => {
-            room.removeMember({
-              id: memberData.id,
-            });
-          });
-
-          const timeSinceLastJoin = Date.now() - startTime;
-          if (timeSinceLastJoin < 10000) {
-            await new Promise((resolve) =>
-              setTimeout(resolve, 10000 - timeSinceLastJoin)
-            );
-          }
-
-          p2p.initSocket();
-        }
-      };
-
-      ws.addEventListener("open", () => {
-        ws.send(JSON.stringify({ name: data.user.name }));
+      ws.on("signal", (data) => {
+        p2pData.peers[data.socketId].signal(data.signal);
       });
-
-      ws.addEventListener("message", (event: ShrughouseWebSocketEvent) => {
-        const eventData = JSON.parse(event.data);
-
-        if (eventData.error) {
-          utils.dispatchEvent("error", { message: eventData.error });
-        } else if (eventData.joined) {
-          room.addMember({
-            id: eventData.socketId,
-          });
-        } else if (eventData.quit) {
-          room.removeMember({
-            id: eventData.socketId,
-          });
-        } else if (eventData.ready) {
-          // All pre-join messages have been delivered.
-        }
-      });
-
-      ws.addEventListener("close", (event) => {
-        utils.dispatchEvent("error", { message: event.reason });
-
-        rejoin();
-      });
-
-      ws.addEventListener("error", (event) => {
-        utils.dispatchEvent("error", {
-          message: "Websocket error",
-          data: event,
-        });
-
-        rejoin();
-      });
-
-      p2p.initMediaReceiver(ws);
     },
 
     remove(socketId: ShrughouseWebSocketId): void {
@@ -187,10 +126,12 @@ export default function AdapterPeers({
           return result;
         });
 
-        utils.dispatchEvent("media", {
-          type: "remove",
-          detail: currentStream,
-        });
+        if (currentStream) {
+          utils.dispatchEvent("media", {
+            type: "remove",
+            detail: currentStream,
+          });
+        }
 
         return newData;
       });
@@ -215,13 +156,10 @@ export default function AdapterPeers({
       p2pData.peers[socketId].on(
         "signal",
         (eventData: SimplePeer.SignalData) => {
-          socket.send(
-            JSON.stringify({
-              media: "signal",
-              signal: eventData,
-              socketId: socketId,
-            })
-          );
+          socket.emit("signal", {
+            signal: eventData,
+            socketId: socketId,
+          });
         }
       );
 
@@ -306,6 +244,7 @@ export default function AdapterPeers({
 
           p2pData.localStream = stream;
           utils.updateData((newData: ShrughouseData) => {
+            newData.user.streamType = "video";
             newData.user.stream = stream;
 
             utils.dispatchEvent("user", {
@@ -344,7 +283,7 @@ export default function AdapterPeers({
     },
 
     init(): void {
-      p2p.initMediaSender(() => {
+      p2p.initMedia(() => {
         p2p.initSocket();
       });
     },

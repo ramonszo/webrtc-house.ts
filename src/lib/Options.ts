@@ -2,7 +2,7 @@ import { ShrughouseOptions } from "../types";
 
 export default {
   storageName: "shrughouse",
-  api: "chat-beta.r-corp.workers.dev",
+  api: "localhost:3013",
   icePolicy: "all",
   iceServers: [
     {

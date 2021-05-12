@@ -11,6 +11,7 @@ export type ShrughouseRoom = {
 
 export type ShrughouseUser = {
   name: string | undefined;
+  streamType?: "video" | "audio";
   stream: ShrughouseMediaStream | undefined;
 };
 

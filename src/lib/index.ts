@@ -17,6 +17,7 @@ function Shrughouse(
     user: {
       name: undefined,
       stream: undefined,
+      streamType: undefined,
     },
     room: {
       name: undefined,
