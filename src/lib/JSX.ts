@@ -5,7 +5,7 @@
   Part of it come from: https://fettblog.eu/jsx-syntactic-sugar/
 */
 
-type DOMProps = { [id: string]: string };
+type DOMProps = { [id: string]: unknown };
 type JSXFunction = (properties: DOMProps) => HTMLElement | string;
 
 // probably there's more tags/attributes on this list but the script only use those.
@@ -53,12 +53,18 @@ function DOMparseNode(
     if (Object.keys(camelCaseAttrs).includes(key)) {
       el.setAttribute(
         camelCaseAttrs[key as keyof typeof camelCaseAttrs],
-        properties[key]
+        properties[key] as string
       );
     } else if (typeof properties[key] !== "string") {
-      Object.defineProperty(el, key, properties[key]);
+      if (key.indexOf("on") === 0) {
+        const eventKey = key.toLowerCase().replace("on", "");
+
+        el.addEventListener(eventKey, properties[key] as EventListener);
+      } else {
+        Object.defineProperty(el, key, properties[key] as string);
+      }
     } else {
-      el.setAttribute(key, properties[key]);
+      el.setAttribute(key, properties[key] as string);
     }
   });
 

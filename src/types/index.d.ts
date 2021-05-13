@@ -42,6 +42,15 @@ export type Shrughouse = {
   };
   components: {
     Panel: JSX;
+    Container: JSX;
+    Footer: JSX;
+    Header: JSX;
+    Listener: JSX;
+    Form: JSX;
+    Room: JSX;
+    RoomActions: JSX;
+    RoomPreview: JSX;
+    Speaker: JSX;
   };
   events: ShrughouseEvents;
   on: (eventName: keyof ShrughouseEvents, callback: () => void) => void;

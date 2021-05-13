@@ -7,6 +7,15 @@ import Room from "./Room";
 import Utils from "./Utils";
 
 import Panel from "../components/Panel";
+import Container from "../components/Container";
+import Footer from "../components/Footer";
+import Form from "../components/Form";
+import Header from "../components/Header";
+import Listener from "../components/Listener";
+import RoomComponent from "../components/Room";
+import RoomActions from "../components/RoomActions";
+import RoomPreview from "../components/RoomPreview";
+import Speaker from "../components/Speaker";
 
 function Shrughouse(
   customOptions: Partial<typeof ShrughouseOptions> = {}
@@ -50,6 +59,15 @@ function Shrughouse(
     },
     components: {
       Panel,
+      Container,
+      Footer,
+      Form,
+      Header,
+      Listener,
+      Room: RoomComponent,
+      RoomActions,
+      RoomPreview,
+      Speaker,
     },
     events: events,
     on: utils.addEventListener,
@@ -62,4 +80,16 @@ if (typeof window !== "undefined") {
 
 export default Shrughouse;
 
-export { Shrughouse, Panel };
+export {
+  Shrughouse,
+  Panel,
+  Container,
+  Footer,
+  Form,
+  Header,
+  Listener,
+  RoomComponent as Room,
+  RoomActions,
+  RoomPreview,
+  Speaker,
+};

@@ -11,77 +11,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
     />
     <style>
-      #vanilla-root {
-        position: relative;
-        z-index: 10;
-      }
-
-      #name-form {
-        display: none;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: white;
-      }
-
-      #name-input {
-        position: fixed;
-        font-size: 200%;
-        top: calc(50% - 1em);
-        left: calc(50% - 8em);
-        width: 16em;
-        height: 2em;
-        margin: 0;
-        text-align: center;
-        border: 1px solid #bbb;
-      }
-
-      #name-form p {
-        position: fixed;
-        top: calc(50% + 3em);
-        width: 100%;
-        text-align: center;
-      }
-
-      #room-form {
-        display: none;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: white;
-        font-size: 200%;
-        margin-top: calc(50vh - 3em);
-        text-align: center;
-      }
-
-      #room-name {
-        font-size: inherit;
-        border: 1px solid #bbb;
-        height: 2em;
-        width: 16em;
-        padding-left: 1em;
-      }
-
-      #room-form button {
-        font-size: inherit;
-        border: 1px solid #bbb;
-        background-color: #eee;
-        height: 2em;
-      }
-
       #room {
         display: none;
-      }
-
-      #go-public {
-        width: 4em;
-      }
-      #go-private {
-        width: 20em;
       }
 
       #video-container {
@@ -94,19 +25,8 @@
       }
     </style>
   </head>
-  <body>
+  <body class="bg-yellow-50">
     <div id="vanilla-root"></div>
-
-    <form id="room-form">
-      <p>Enter a public room:</p>
-      <input id="room-name" placeholder="room name" /><button id="go-public">
-        Go &raquo;
-      </button>
-    </form>
-
-    <form id="name-form">
-      <input id="name-input" placeholder="your name" />
-    </form>
 
     <form id="room">
       <div id="video-container">
@@ -187,6 +107,13 @@
           console.log('room member', event);
         });
 
+        function setRoot(el) {
+          const root = document.querySelector('#vanilla-root');
+
+          root.innerHTML = '';
+          root.appendChild(el);
+        }
+
         function startRoom(name) {
           let room = document.querySelector('#room');
 
@@ -202,17 +129,9 @@
         }
 
         function roomChooser() {
-          let roomForm = document.querySelector('#room-form');
-          let roomNameInput = document.querySelector('#room-name');
-          let goPublicButton = document.querySelector('#go-public');
-          let goPrivateButton = document.querySelector('#go-private');
-
-          roomForm.style.display = 'block';
-
           const showNameChooser = (name) => {
-            roomForm.style.display = 'none';
-
             document.location.hash = name;
+
             nameChooser(name);
           };
 
@@ -222,66 +141,61 @@
             return;
           }
 
-          roomForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+          setRoot(
+            zuckHouse.components.Panel({
+              children: [
+                zuckHouse.components.Form({
+                  title: 'Enter room name',
+                  placeholderText: 'room name',
+                  actionText: 'continue',
+                  onSubmit(event) {
+                    event.preventDefault();
 
-            showNameChooser(roomNameInput.value);
-          });
+                    const form = event.target;
 
-          roomNameInput.addEventListener('input', (event) => {
-            if (event.currentTarget.value.length > 32) {
-              event.currentTarget.value = event.currentTarget.value.slice(
-                0,
-                32
-              );
-            }
-          });
+                    let value = form.querySelector('input').value;
+                    if (value.length > 32) {
+                      value = value.slice(0, 32);
+                    }
 
-          goPublicButton.addEventListener('click', (event) => {
-            showNameChooser(roomNameInput.value);
-          });
-
-          roomNameInput.focus();
+                    showNameChooser(value);
+                  },
+                }),
+              ],
+            })
+          );
         }
 
         function nameChooser(roomName) {
-          let nameForm = document.querySelector('#name-form');
-          let nameInput = document.querySelector('#name-input');
+          setRoot(
+            zuckHouse.components.Panel({
+              children: [
+                zuckHouse.components.Form({
+                  title: 'Enter your name',
+                  placeholderText: 'your name',
+                  actionText: 'enter',
+                  onSubmit(event) {
+                    event.preventDefault();
 
-          nameForm.style.display = 'block';
+                    const form = event.target;
 
-          nameForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+                    let value = form.querySelector('input').value;
 
-            if (nameInput.value.length > 0) {
-              zuckHouse.user.set({
-                name: nameInput.value,
-              });
+                    if (value.length > 0) {
+                      zuckHouse.user.set({
+                        name: value,
+                      });
 
-              nameForm.style.display = 'none';
-              startRoom(roomName);
-            }
-          });
-
-          nameInput.addEventListener('input', (event) => {
-            if (event.currentTarget.value.length > 32) {
-              event.currentTarget.value = event.currentTarget.value.slice(
-                0,
-                32
-              );
-            }
-          });
-
-          nameInput.focus();
+                      startRoom(roomName);
+                    }
+                  },
+                }),
+              ],
+            })
+          );
         }
 
         roomChooser();
-
-        document.querySelector('#vanilla-root').appendChild(
-          zuckHouse.components.Panel({
-            title: 'Vanilla title',
-          })
-        );
       }
 
       window.onload = () => {
