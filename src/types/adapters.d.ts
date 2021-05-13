@@ -9,18 +9,5 @@ export type ShrughouseAdapterPeersData = {
     [keyname: string]: SimplePeer.Instance;
   };
   localStream: undefined | ShrughouseMediaStream;
-  constraints: {
-    audio: boolean;
-    video: {
-      width: {
-        max: number;
-      };
-      height: {
-        max: number;
-      };
-      facingMode: {
-        ideal: string;
-      };
-    };
-  };
+  constraints: MediaStreamConstraints;
 };

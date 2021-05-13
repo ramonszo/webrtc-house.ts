@@ -14,7 +14,6 @@ import Header from "../components/Header";
 import Listener from "../components/Listener";
 import RoomComponent from "../components/Room";
 import RoomActions from "../components/RoomActions";
-import RoomPreview from "../components/RoomPreview";
 import Speaker from "../components/Speaker";
 
 function Shrughouse(
@@ -66,7 +65,6 @@ function Shrughouse(
       Listener,
       Room: RoomComponent,
       RoomActions,
-      RoomPreview,
       Speaker,
     },
     events: events,
@@ -90,6 +88,5 @@ export {
   Listener,
   RoomComponent as Room,
   RoomActions,
-  RoomPreview,
   Speaker,
 };

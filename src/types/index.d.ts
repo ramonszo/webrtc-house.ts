@@ -49,7 +49,6 @@ export type Shrughouse = {
     Form: JSX;
     Room: JSX;
     RoomActions: JSX;
-    RoomPreview: JSX;
     Speaker: JSX;
   };
   events: ShrughouseEvents;

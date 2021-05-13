@@ -3,17 +3,19 @@ import JSX from "../lib/JSX";
 import MicrophoneMutedIcon from "./Icons/MicrophoneMuted";
 import MicrophoneIcon from "./Icons/Microphone";
 
+export type SpeakerProps = {
+  image?: string;
+  name?: string;
+  muted?: boolean;
+  moderator?: boolean;
+};
+
 export default ({
   image,
   name,
   muted,
   moderator,
-}: {
-  image?: string;
-  name?: string;
-  muted?: boolean;
-  moderator?: boolean;
-}): JSX.Element => {
+}: SpeakerProps): JSX.Element => {
   return (
     <div className="flex flex-col items-center overflow-hidden p-2">
       <div className="rounded-full bg-gray-200 w-20 h-20 mb-2 relative">

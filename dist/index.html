@@ -10,37 +10,35 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
     />
-    <style>
-      #room {
-        display: none;
-      }
-
-      #video-container {
-        position: relative;
-        z-index: 20;
-      }
-
-      .container {
-        display: flex;
-      }
-    </style>
   </head>
   <body class="bg-yellow-50">
     <div id="vanilla-root"></div>
-
-    <form id="room">
-      <div id="video-container">
-        <div id="videos" class="container"></div>
-      </div>
-    </form>
+    <div id="media-container" class="hidden"></div>
 
     <script>
       function app() {
         const zuckHouse = Shrughouse();
 
+        let room = undefined;
+        let user = undefined;
+        let speakers = [];
+
+        const setRoot = (el) => {
+          const root = document.querySelector('#vanilla-root');
+
+          root.innerHTML = '';
+          root.appendChild(el);
+        };
+
+        const getAvatar = (value) => {
+          return 'https://avatars.dicebear.com/api/micah/' + value + '.svg';
+        };
+
         const createMedia = (id, type, src) => {
+          const mediaContainer = document.querySelector('#media-container');
+
           if (!document.querySelector(`#${id}`)) {
-            let newVid = document.createElement(type || 'video');
+            let newVid = document.createElement(type || 'media');
 
             newVid.srcObject = src;
             newVid.id = id;
@@ -52,71 +50,39 @@
               newVid.muted = true;
             }
 
-            videos.appendChild(newVid);
+            mediaContainer.appendChild(newVid);
           }
         };
 
         const removeMedia = (id) => {
-          const videoEl = document.querySelector(`#${id}`);
+          const mediaEl = document.querySelector(`#${id}`);
 
-          if (videoEl) {
-            const tracks = videoEl.srcObject.getTracks();
+          if (mediaEl) {
+            const tracks = mediaEl.srcObject.getTracks();
 
             tracks.forEach(function (track) {
               track.stop();
             });
 
-            videoEl.srcObject = null;
-            videoEl.parentNode.removeChild(videoEl);
+            mediaEl.srcObject = null;
+            mediaEl.parentNode.removeChild(mediaEl);
           }
         };
 
-        zuckHouse.on('user', function (event) {
-          const type = event.type;
-          const user = event.detail;
+        const updateRoom = (data) => {
+          setRoot(
+            zuckHouse.components.Panel({
+              children: [
+                zuckHouse.components.Room({
+                  title: room,
+                  speakers: speakers,
+                }),
+              ],
+            })
+          );
+        };
 
-          if (type === 'update') {
-            if (user.stream) {
-              createMedia('user', user.streamType, user.stream);
-            } else {
-              removeMedia('user');
-            }
-          }
-        });
-
-        zuckHouse.on('media', function (event) {
-          const type = event.type;
-          const stream = event.detail;
-
-          const videos = document.querySelector('#videos');
-
-          if (type === 'add') {
-            createMedia(
-              `stream-${stream.id}`,
-              stream.streamType,
-              stream.stream
-            );
-          } else if (type === 'remove') {
-            removeMedia(`stream-${stream.id}`);
-          } else {
-            // mute
-          }
-        });
-
-        zuckHouse.on('room:member', function (event) {
-          console.log('room member', event);
-        });
-
-        function setRoot(el) {
-          const root = document.querySelector('#vanilla-root');
-
-          root.innerHTML = '';
-          root.appendChild(el);
-        }
-
-        function startRoom(name) {
-          let room = document.querySelector('#room');
-
+        const startRoom = (name) => {
           if (name.length > 0) {
             zuckHouse.room.set({
               name: name,
@@ -124,11 +90,11 @@
 
             zuckHouse.room.start();
 
-            room.style.display = 'block';
+            updateRoom();
           }
-        }
+        };
 
-        function roomChooser() {
+        const roomChooser = () => {
           const showNameChooser = (name) => {
             document.location.hash = name;
 
@@ -164,9 +130,9 @@
               ],
             })
           );
-        }
+        };
 
-        function nameChooser(roomName) {
+        const nameChooser = (roomName) => {
           setRoot(
             zuckHouse.components.Panel({
               children: [
@@ -186,6 +152,15 @@
                         name: value,
                       });
 
+                      room = roomName;
+                      user = value;
+
+                      speakers.push({
+                        id: 'me',
+                        name: value,
+                        image: getAvatar(value),
+                      });
+
                       startRoom(roomName);
                     }
                   },
@@ -193,9 +168,53 @@
               ],
             })
           );
-        }
+        };
 
         roomChooser();
+
+        zuckHouse.on('user', function (event) {
+          const type = event.type;
+          const user = event.detail;
+
+          if (type === 'update') {
+            if (user.stream) {
+              createMedia('user', user.streamType, user.stream);
+            } else {
+              removeMedia('user');
+            }
+          }
+        });
+
+        zuckHouse.on('media', function (event) {
+          const type = event.type;
+          const stream = event.detail;
+
+          if (type === 'add') {
+            createMedia(
+              `stream-${stream.id}`,
+              stream.streamType,
+              stream.stream
+            );
+          } else if (type === 'remove') {
+            removeMedia(`stream-${stream.id}`);
+          } else {
+            // mute
+          }
+        });
+
+        zuckHouse.on('room:member', function (event) {
+          const member = event.detail;
+
+          if (event.type === 'add') {
+            member.image = getAvatar(member.name);
+
+            speakers.push(member);
+          } else {
+            speakers = speakers.filter((speakers) => speakers.id !== member.id);
+          }
+
+          updateRoom();
+        });
       }
 
       window.onload = () => {

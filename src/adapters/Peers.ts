@@ -27,17 +27,7 @@ export default function AdapterPeers({
     localStream: undefined,
     constraints: {
       audio: true,
-      video: {
-        width: {
-          max: 300,
-        },
-        height: {
-          max: 300,
-        },
-        facingMode: {
-          ideal: "user",
-        },
-      },
+      video: false,
     },
   };
 
@@ -87,10 +77,15 @@ export default function AdapterPeers({
         ws.emit("initSend", { socketId: socketId });
       });
 
-      ws.on("initSend", (data: { socketId: string }) => {
-        const { socketId } = data;
+      ws.on("initSend", (data: { socketId: string; user: string }) => {
+        const { socketId, user } = data;
 
         p2p.add(ws, socketId, true);
+
+        room.addMember({
+          id: socketId,
+          name: user,
+        });
       });
 
       ws.on("removePeer", (socketId: string) => {
@@ -167,7 +162,7 @@ export default function AdapterPeers({
         utils.updateData((newData: ShrughouseData) => {
           const currentStream = {
             id: socketId,
-            streamType: "video",
+            streamType: "audio",
             stream,
           };
 
@@ -192,12 +187,6 @@ export default function AdapterPeers({
     },
 
     switchMedia(): void {
-      if (p2pData.constraints.video.facingMode.ideal === "user") {
-        p2pData.constraints.video.facingMode.ideal = "environment";
-      } else {
-        p2pData.constraints.video.facingMode.ideal = "user";
-      }
-
       if (p2pData.localStream) {
         const tracks = p2pData.localStream.getTracks();
 
@@ -244,7 +233,7 @@ export default function AdapterPeers({
 
           p2pData.localStream = stream;
           utils.updateData((newData: ShrughouseData) => {
-            newData.user.streamType = "video";
+            newData.user.streamType = "audio";
             newData.user.stream = stream;
 
             utils.dispatchEvent("user", {
