@@ -8,7 +8,6 @@ export type ShrughouseRoomComponent = {
   set(values: Partial<ShrughouseData["room"]>): void;
   addMember(member: ShrughouseRoomMember): void;
   removeMember(member: ShrughouseRoomMember): void;
-  start(): void;
 };
 
 export type ShrughouseUtilsComponent = {

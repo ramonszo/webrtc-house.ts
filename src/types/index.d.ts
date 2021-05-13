@@ -13,10 +13,7 @@ import {
   ShrughouseRoomMember,
   ShrughouseRoom,
   ShrughouseUser,
-  ShrughouseWebSocket,
-  ShrughouseWebSocketEvent,
-  ShrughouseWebSocketId,
-  ShrughouseWebSocketMessage,
+  ShrughouseSocketId,
   ShrughouseEvent,
   ShrughouseEvents,
   ShrughouseOptions,
@@ -35,7 +32,6 @@ export type Shrughouse = {
   uid: string;
   room: {
     set: (values: Partial<ShrughouseData["room"]>) => void;
-    start: () => void;
   };
   user: {
     set: (values: Partial<ShrughouseData["user"]>) => void;
@@ -53,6 +49,9 @@ export type Shrughouse = {
   };
   events: ShrughouseEvents;
   on: (eventName: keyof ShrughouseEvents, callback: () => void) => void;
+  init: () => void;
+  action: (action: ShrughouseAdapterActions) => void;
+  disconnect: () => void;
 };
 
 export {
@@ -61,6 +60,7 @@ export {
   ShrughouseOptions,
   ShrughouseAdapterProps,
   ShrughouseAdapterPeersData,
+  ShrughouseAdapterActions,
   ShrughouseProps,
   ShrughouseRoomComponent,
   ShrughouseUtilsComponent,
@@ -70,8 +70,5 @@ export {
   ShrughouseRoomMember,
   ShrughouseRoom,
   ShrughouseUser,
-  ShrughouseWebSocket,
-  ShrughouseWebSocketEvent,
-  ShrughouseWebSocketId,
-  ShrughouseWebSocketMessage,
+  ShrughouseSocketId,
 };

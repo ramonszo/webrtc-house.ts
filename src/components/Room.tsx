@@ -1,4 +1,5 @@
 import JSX from "../lib/JSX";
+import { Shrughouse } from "../types";
 
 import Container from "./Container";
 
@@ -14,10 +15,16 @@ export default ({
   title,
   speakers,
   listeners,
+  muted,
+  onDisconnect,
+  onAction,
 }: {
   title: string;
   speakers?: SpeakerProps[];
   listeners?: ListenerProps[];
+  muted?: boolean;
+  onDisconnect: Shrughouse["disconnect"];
+  onAction: Shrughouse["action"];
 }): JSX.Element => {
   return (
     <Container>
@@ -47,14 +54,17 @@ export default ({
       </div>
 
       <Footer>
-        <button className="rounded-full bg-gray-200 py-2 px-4 h-10 flex items-center whitespace-nowrap mr-4">
+        <button
+          className="rounded-full bg-gray-200 py-2 px-4 h-10 flex items-center whitespace-nowrap mr-4"
+          onClick={onDisconnect}
+        >
           <span className="mt-0.5">✌️</span>
           <span className="text-red-400 ml-2 text-sm font-semibold">
             Leave quietly
           </span>
         </button>
 
-        <RoomActions />
+        <RoomActions onAction={onAction} muted={muted} />
       </Footer>
     </Container>
   );

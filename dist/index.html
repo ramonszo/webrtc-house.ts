@@ -21,6 +21,7 @@
 
         let room = undefined;
         let user = undefined;
+        let muted = false;
         let speakers = [];
 
         const setRoot = (el) => {
@@ -76,6 +77,18 @@
                 zuckHouse.components.Room({
                   title: room,
                   speakers: speakers,
+                  muted: muted,
+                  onDisconnect: zuckHouse.disconnect,
+                  onAction: (action) => {
+                    if (action === 'add') {
+                      window.prompt(
+                        'Share this link with someone',
+                        location.href
+                      );
+                    } else {
+                      zuckHouse.action(action);
+                    }
+                  },
                 }),
               ],
             })
@@ -88,7 +101,7 @@
               name: name,
             });
 
-            zuckHouse.room.start();
+            zuckHouse.init();
 
             updateRoom();
           }
@@ -200,6 +213,15 @@
           } else {
             // mute
           }
+        });
+
+        zuckHouse.on('disconnect', function () {
+          room = undefined;
+          user = undefined;
+          muted = false;
+          speakers = [];
+
+          roomChooser();
         });
 
         zuckHouse.on('room:member', function (event) {

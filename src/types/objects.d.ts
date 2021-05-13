@@ -15,17 +15,7 @@ export type ShrughouseUser = {
   stream: ShrughouseMediaStream | undefined;
 };
 
-export type ShrughouseWebSocket = Websocket;
-
-export type ShrughouseWebSocketEvent = WebSocket.IMessageEvent;
-
-export type ShrughouseWebSocketId = string;
-
-export type ShrughouseWebSocketMessage = {
-  socketId: ShrughouseWebSocketId;
-  media?: string;
-  signal?: SimplePeer.SignalData;
-};
+export type ShrughouseSocketId = string;
 
 export type ShrughouseEvent<EventData> = (eventData: {
   type?: "update" | "add" | "remove";
@@ -38,6 +28,7 @@ export type ShrughouseEvents = {
   "room:member": ShrughouseEvent<ShrughouseRoomMember>[];
   user: ShrughouseEvent<ShrughouseUser>[];
   media: ShrughouseEvent<ShrughouseMediaStream>[];
+  disconnect: ShrughouseEvent<ShrughouseUser>[];
   error: ShrughouseEvents<{ message: string }>[];
 };
 

@@ -7,8 +7,6 @@ import {
 
 import Utils from "./Utils";
 
-import PeersAdapter from "../adapters/Peers";
-
 export default function Room({
   options,
   data,
@@ -94,12 +92,6 @@ export default function Room({
 
         return newData;
       });
-    },
-
-    start() {
-      const p2p = PeersAdapter({ options, data, events, room });
-
-      p2p.init();
     },
   };
 

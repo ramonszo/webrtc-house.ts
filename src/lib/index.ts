@@ -16,6 +16,8 @@ import RoomComponent from "../components/Room";
 import RoomActions from "../components/RoomActions";
 import Speaker from "../components/Speaker";
 
+import PeersAdapter from "../adapters/Peers";
+
 function Shrughouse(
   customOptions: Partial<typeof ShrughouseOptions> = {}
 ): Shrughouse {
@@ -39,6 +41,7 @@ function Shrughouse(
     user: [],
     room: [],
     "room:member": [],
+    disconnect: [],
     media: [],
     error: [],
   };
@@ -47,6 +50,8 @@ function Shrughouse(
   const room = Room({ options, data, events });
   const user = User({ options, data, events });
 
+  const adapter = PeersAdapter({ options, data, events, room });
+
   return {
     uid: utils.getUuid(),
     user: {
@@ -54,7 +59,6 @@ function Shrughouse(
     },
     room: {
       set: room.set,
-      start: room.start,
     },
     components: {
       Panel,
@@ -69,6 +73,10 @@ function Shrughouse(
     },
     events: events,
     on: utils.addEventListener,
+
+    disconnect: adapter.disconnect,
+    action: adapter.action,
+    init: adapter.init,
   };
 }
 

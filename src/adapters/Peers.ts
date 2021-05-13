@@ -1,13 +1,14 @@
 import SimplePeer from "simple-peer";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 import {
+  Shrughouse,
   ShrughouseData,
   ShrughouseAdapterPeersData,
   ShrughouseMediaStream,
-  ShrughouseWebSocket,
-  ShrughouseWebSocketId,
+  ShrughouseSocketId,
   ShrughouseAdapterProps,
+  ShrughouseAdapterActions,
 } from "../types";
 
 import Utils from "../lib/Utils";
@@ -18,7 +19,9 @@ export default function AdapterPeers({
   events,
   room,
 }: ShrughouseAdapterProps): {
-  init: () => void;
+  init: Shrughouse["init"];
+  action: Shrughouse["action"];
+  disconnect: Shrughouse["disconnect"];
 } {
   const utils = Utils({ options, data, events });
 
@@ -30,6 +33,8 @@ export default function AdapterPeers({
       video: false,
     },
   };
+
+  let apiSocket: Socket | undefined;
 
   const p2p = {
     initMedia(callback: () => void): void {
@@ -59,28 +64,33 @@ export default function AdapterPeers({
     },
 
     initSocket(): void {
-      const ws = io(
+      apiSocket = io(
         (location.protocol === "https:" ? "wss" : "ws") + "://" + options.api,
         { query: { room: data.room.name, user: data.user.name } }
       );
 
-      ws.on("initReceive", (data: { socketId: string; user: string }) => {
+      apiSocket.on(
+        "initReceive",
+        (data: { socketId: string; user: string }) => {
+          const { socketId, user } = data;
+
+          p2p.add(socketId, false);
+
+          room.addMember({
+            id: data.socketId,
+            name: user,
+          });
+
+          if (apiSocket) {
+            apiSocket.emit("initSend", { socketId: socketId });
+          }
+        }
+      );
+
+      apiSocket.on("initSend", (data: { socketId: string; user: string }) => {
         const { socketId, user } = data;
 
-        p2p.add(ws, socketId, false);
-
-        room.addMember({
-          id: data.socketId,
-          name: user,
-        });
-
-        ws.emit("initSend", { socketId: socketId });
-      });
-
-      ws.on("initSend", (data: { socketId: string; user: string }) => {
-        const { socketId, user } = data;
-
-        p2p.add(ws, socketId, true);
+        p2p.add(socketId, true);
 
         room.addMember({
           id: socketId,
@@ -88,7 +98,7 @@ export default function AdapterPeers({
         });
       });
 
-      ws.on("removePeer", (socketId: string) => {
+      apiSocket.on("removePeer", (socketId: string) => {
         p2p.remove(socketId);
 
         room.removeMember({
@@ -96,18 +106,18 @@ export default function AdapterPeers({
         });
       });
 
-      ws.on("disconnect", () => {
+      apiSocket.on("disconnect", () => {
         Object.keys(p2pData.peers).forEach((socketId: string) => {
           p2p.remove(socketId);
         });
       });
 
-      ws.on("signal", (data) => {
+      apiSocket.on("signal", (data) => {
         p2pData.peers[data.socketId].signal(data.signal);
       });
     },
 
-    remove(socketId: ShrughouseWebSocketId): void {
+    remove(socketId: ShrughouseSocketId): void {
       utils.updateData((newData: ShrughouseData, oldData: ShrughouseData) => {
         let currentStream;
 
@@ -137,11 +147,7 @@ export default function AdapterPeers({
       }
     },
 
-    add(
-      socket: ShrughouseWebSocket,
-      socketId: ShrughouseWebSocketId,
-      initiator: boolean
-    ): void {
+    add(socketId: ShrughouseSocketId, initiator: boolean): void {
       p2pData.peers[socketId] = new SimplePeer({
         initiator: initiator,
         stream: p2pData.localStream,
@@ -151,10 +157,12 @@ export default function AdapterPeers({
       p2pData.peers[socketId].on(
         "signal",
         (eventData: SimplePeer.SignalData) => {
-          socket.emit("signal", {
-            signal: eventData,
-            socketId: socketId,
-          });
+          if (apiSocket) {
+            apiSocket.emit("signal", {
+              signal: eventData,
+              socketId: socketId,
+            });
+          }
         }
       );
 
@@ -178,7 +186,7 @@ export default function AdapterPeers({
       });
     },
 
-    get(id: ShrughouseWebSocketId): SimplePeer.Instance {
+    get(id: ShrughouseSocketId): SimplePeer.Instance {
       return p2pData.peers[id];
     },
 
@@ -186,7 +194,24 @@ export default function AdapterPeers({
       return p2pData.peers;
     },
 
-    switchMedia(): void {
+    action(action: ShrughouseAdapterActions): void {
+      switch (action) {
+        case "mute":
+          (() => {
+            const stream = p2pData.localStream;
+
+            for (const index in stream.getAudioTracks()) {
+              stream.getAudioTracks()[index].enabled = !stream.getAudioTracks()[
+                index
+              ].enabled;
+            }
+          })();
+
+          break;
+      }
+    },
+
+    disconnect(): void {
       if (p2pData.localStream) {
         const tracks = p2pData.localStream.getTracks();
 
@@ -202,63 +227,7 @@ export default function AdapterPeers({
             detail: newData.user,
           });
 
-          return newData;
-        });
-      }
-
-      navigator.mediaDevices
-        .getUserMedia(p2pData.constraints)
-        .then((stream) => {
-          Object.keys(p2pData.peers).forEach(
-            (socketId: ShrughouseWebSocketId) => {
-              for (const index in p2pData.peers[
-                socketId
-              ].streams[0].getTracks()) {
-                for (const index2 in stream.getTracks()) {
-                  if (
-                    p2pData.peers[socketId].streams[0].getTracks()[index]
-                      .kind === stream.getTracks()[index2].kind
-                  ) {
-                    p2pData.peers[socketId].replaceTrack(
-                      p2pData.peers[socketId].streams[0].getTracks()[index],
-                      stream.getTracks()[index2],
-                      p2pData.peers[socketId].streams[0]
-                    );
-                    break;
-                  }
-                }
-              }
-            }
-          );
-
-          p2pData.localStream = stream;
-          utils.updateData((newData: ShrughouseData) => {
-            newData.user.streamType = "audio";
-            newData.user.stream = stream;
-
-            utils.dispatchEvent("user", {
-              type: "update",
-              detail: newData.user,
-            });
-
-            return newData;
-          });
-        });
-    },
-
-    removeLocalStream(): void {
-      if (p2pData.localStream) {
-        const tracks = p2pData.localStream.getTracks();
-
-        tracks.forEach(function (track: MediaStreamTrack) {
-          track.stop();
-        });
-
-        utils.updateData((newData: ShrughouseData) => {
-          newData.user.stream = undefined;
-
-          utils.dispatchEvent("user", {
-            type: "update",
+          utils.dispatchEvent("disconnect", {
             detail: newData.user,
           });
 
@@ -268,6 +237,13 @@ export default function AdapterPeers({
 
       for (const socketId in p2pData.peers) {
         p2p.remove(socketId);
+      }
+
+      p2pData.localStream = undefined;
+      p2pData.peers = {};
+
+      if (apiSocket) {
+        apiSocket.disconnect();
       }
     },
 
@@ -280,5 +256,7 @@ export default function AdapterPeers({
 
   return {
     init: p2p.init,
+    action: p2p.action,
+    disconnect: p2p.disconnect,
   };
 }
