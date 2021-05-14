@@ -1,8 +1,8 @@
-import { ShrughouseProps, ShrughouseStorageComponent } from "../types";
+import { RTChouseProps, RTChouseStorageComponent } from "../types";
 
 export default function Storage({
   options,
-}: ShrughouseProps): ShrughouseStorageComponent {
+}: RTChouseProps): RTChouseStorageComponent {
   const storage = {
     get(name: string): string | null {
       return localStorage.getItem(options.storageName + ":" + name);

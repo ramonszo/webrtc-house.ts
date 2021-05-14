@@ -1,5 +1,5 @@
 {
-  "name": "shrughouse.ts",
+  "name": "RTChouse.ts",
   "version": "0.0.1",
   "description": "Add voice rooms EVERYWHERE.",
   "main": "./src/app.ts",

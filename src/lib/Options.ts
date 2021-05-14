@@ -1,7 +1,7 @@
-import { ShrughouseOptions } from "../types";
+import { RTChouseOptions } from "../types";
 
 export default {
-  storageName: "shrughouse",
+  storageName: "RTChouse",
   api: "localhost:3013",
   icePolicy: "all",
   iceServers: [
@@ -14,4 +14,4 @@ export default {
       username: "28224511:1379330808",
     },
   ],
-} as ShrughouseOptions;
+} as RTChouseOptions;

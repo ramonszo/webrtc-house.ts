@@ -1,15 +1,15 @@
-import { ShrughouseRoomComponent } from "./components";
+import { RTChouseRoomComponent } from "./components";
 
-export type ShrughouseAdapterProps = ShrughouseProps & {
-  room: ShrughouseRoomComponent;
+export type RTChouseAdapterProps = RTChouseProps & {
+  room: RTChouseRoomComponent;
 };
 
-export type ShrughouseAdapterActions = "mute";
+export type RTChouseAdapterActions = "mute";
 
-export type ShrughouseAdapterPeersData = {
+export type RTChouseAdapterPeersData = {
   peers: {
     [keyname: string]: SimplePeer.Instance;
   };
-  localStream: undefined | ShrughouseMediaStream;
+  localStream: undefined | RTChouseMediaStream;
   constraints: MediaStreamConstraints;
 };

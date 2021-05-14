@@ -1,6 +1,6 @@
 import JSX from "../lib/JSX";
 
-import { Shrughouse } from "../types";
+import { RTChouse } from "../types";
 
 import AddIcon from "./Icons/Add";
 import MicrophoneIcon from "./Icons/Microphone";
@@ -11,7 +11,7 @@ export default ({
   onAction,
 }: {
   muted?: boolean;
-  onAction: Shrughouse["action"];
+  onAction: RTChouse["action"];
 }): JSX.Element => {
   return (
     <div className="flex items-center">

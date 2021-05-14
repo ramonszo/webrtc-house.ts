@@ -1,42 +1,42 @@
-export type ShrughouseMediaStream = MediaStream;
+export type RTChouseMediaStream = MediaStream;
 
-export type ShrughouseRoomMember = {
+export type RTChouseRoomMember = {
   id: string;
 };
 
-export type ShrughouseRoom = {
+export type RTChouseRoom = {
   name: string | undefined;
-  members: ShrughouseRoomMember[];
+  members: RTChouseRoomMember[];
 };
 
-export type ShrughouseUser = {
+export type RTChouseUser = {
   name: string | undefined;
   streamType?: "video" | "audio";
-  stream: ShrughouseMediaStream | undefined;
+  stream: RTChouseMediaStream | undefined;
 };
 
-export type ShrughouseSocketId = string;
+export type RTChouseSocketId = string;
 
-export type ShrughouseEvent<EventData> = (eventData: {
+export type RTChouseEvent<EventData> = (eventData: {
   type?: "update" | "add" | "remove";
   details: EventData;
 }) => void;
 
-export type ShrughouseEvents = {
-  data: ShrughouseEvent<ShrughouseData>[];
-  room: ShrughouseEvent<ShrughouseRoom>[];
-  "room:member": ShrughouseEvent<ShrughouseRoomMember>[];
-  user: ShrughouseEvent<ShrughouseUser>[];
-  media: ShrughouseEvent<ShrughouseMediaStream>[];
-  disconnect: ShrughouseEvent<ShrughouseUser>[];
-  error: ShrughouseEvents<{ message: string }>[];
-  action: ShrughouseEvents<{
+export type RTChouseEvents = {
+  data: RTChouseEvent<RTChouseData>[];
+  room: RTChouseEvent<RTChouseRoom>[];
+  "room:member": RTChouseEvent<RTChouseRoomMember>[];
+  user: RTChouseEvent<RTChouseUser>[];
+  media: RTChouseEvent<RTChouseMediaStream>[];
+  disconnect: RTChouseEvent<RTChouseUser>[];
+  error: RTChouseEvents<{ message: string }>[];
+  action: RTChouseEvents<{
     action: string;
     value: boolean | string | undefined;
   }>[];
 };
 
-export type ShrughouseOptions = {
+export type RTChouseOptions = {
   storageName: string;
   api: string;
   mode: string;

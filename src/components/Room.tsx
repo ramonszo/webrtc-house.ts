@@ -1,5 +1,5 @@
 import JSX from "../lib/JSX";
-import { Shrughouse } from "../types";
+import { RTChouse } from "../types";
 
 import Container from "./Container";
 
@@ -23,8 +23,8 @@ export default ({
   speakers?: SpeakerProps[];
   listeners?: ListenerProps[];
   muted?: boolean;
-  onDisconnect: Shrughouse["disconnect"];
-  onAction: Shrughouse["action"];
+  onDisconnect: RTChouse["disconnect"];
+  onAction: RTChouse["action"];
 }): JSX.Element => {
   return (
     <Container>

@@ -1,40 +1,40 @@
-import { ShrughouseAdapterProps, ShrughouseAdapterPeersData } from "./adapters";
+import { RTChouseAdapterProps, RTChouseAdapterPeersData } from "./adapters";
 
 import {
-  ShrughouseProps,
-  ShrughouseRoomComponent,
-  ShrughouseUtilsComponent,
-  ShrughouseStorageComponent,
-  ShrughouseUserComponent,
+  RTChouseProps,
+  RTChouseRoomComponent,
+  RTChouseUtilsComponent,
+  RTChouseStorageComponent,
+  RTChouseUserComponent,
 } from "./components";
 
 import {
-  ShrughouseMediaStream,
-  ShrughouseRoomMember,
-  ShrughouseRoom,
-  ShrughouseUser,
-  ShrughouseSocketId,
-  ShrughouseEvent,
-  ShrughouseEvents,
-  ShrughouseOptions,
+  RTChouseMediaStream,
+  RTChouseRoomMember,
+  RTChouseRoom,
+  RTChouseUser,
+  RTChouseSocketId,
+  RTChouseEvent,
+  RTChouseEvents,
+  RTChouseOptions,
 } from "./objects";
 
-export type ShrughouseData = {
-  user: ShrughouseUser;
-  room: ShrughouseRoom;
+export type RTChouseData = {
+  user: RTChouseUser;
+  room: RTChouseRoom;
   streams: {
     id: string;
-    stream: ShrughouseMediaStream;
+    stream: RTChouseMediaStream;
   }[];
 };
 
-export type Shrughouse = {
+export type RTChouse = {
   uid: string;
   room: {
-    set: (values: Partial<ShrughouseData["room"]>) => void;
+    set: (values: Partial<RTChouseData["room"]>) => void;
   };
   user: {
-    set: (values: Partial<ShrughouseData["user"]>) => void;
+    set: (values: Partial<RTChouseData["user"]>) => void;
   };
   components: {
     Panel: JSX;
@@ -47,28 +47,28 @@ export type Shrughouse = {
     RoomActions: JSX;
     Speaker: JSX;
   };
-  events: ShrughouseEvents;
-  on: (eventName: keyof ShrughouseEvents, callback: () => void) => void;
+  events: RTChouseEvents;
+  on: (eventName: keyof RTChouseEvents, callback: () => void) => void;
   init: (callback: () => void) => void;
-  action: (action: ShrughouseAdapterActions) => void;
+  action: (action: RTChouseAdapterActions) => void;
   disconnect: () => void;
 };
 
 export {
-  ShrughouseEvent,
-  ShrughouseEvents,
-  ShrughouseOptions,
-  ShrughouseAdapterProps,
-  ShrughouseAdapterPeersData,
-  ShrughouseAdapterActions,
-  ShrughouseProps,
-  ShrughouseRoomComponent,
-  ShrughouseUtilsComponent,
-  ShrughouseStorageComponent,
-  ShrughouseUserComponent,
-  ShrughouseMediaStream,
-  ShrughouseRoomMember,
-  ShrughouseRoom,
-  ShrughouseUser,
-  ShrughouseSocketId,
+  RTChouseEvent,
+  RTChouseEvents,
+  RTChouseOptions,
+  RTChouseAdapterProps,
+  RTChouseAdapterPeersData,
+  RTChouseAdapterActions,
+  RTChouseProps,
+  RTChouseRoomComponent,
+  RTChouseUtilsComponent,
+  RTChouseStorageComponent,
+  RTChouseUserComponent,
+  RTChouseMediaStream,
+  RTChouseRoomMember,
+  RTChouseRoom,
+  RTChouseUser,
+  RTChouseSocketId,
 };

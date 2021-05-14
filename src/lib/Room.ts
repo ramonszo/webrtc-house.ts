@@ -1,8 +1,8 @@
 import {
-  ShrughouseProps,
-  ShrughouseData,
-  ShrughouseRoomMember,
-  ShrughouseRoomComponent,
+  RTChouseProps,
+  RTChouseData,
+  RTChouseRoomMember,
+  RTChouseRoomComponent,
 } from "../types";
 
 import Utils from "./Utils";
@@ -11,11 +11,11 @@ export default function Room({
   options,
   data,
   events,
-}: ShrughouseProps): ShrughouseRoomComponent {
+}: RTChouseProps): RTChouseRoomComponent {
   const utils = Utils({ options, data, events });
 
   const room = {
-    set(values: Partial<ShrughouseData["room"]>) {
+    set(values: Partial<RTChouseData["room"]>) {
       if (values.name) {
         values.name = values.name
           .replace(/[^a-zA-Z0-9_-]/g, "")
@@ -29,7 +29,7 @@ export default function Room({
         }
       }
 
-      utils.updateData((newData: ShrughouseData, oldData: ShrughouseData) => {
+      utils.updateData((newData: RTChouseData, oldData: RTChouseData) => {
         newData.room = {
           ...oldData.room,
           ...values,
@@ -44,8 +44,8 @@ export default function Room({
       });
     },
 
-    updateMember(member: ShrughouseRoomMember) {
-      utils.updateData((newData: ShrughouseData) => {
+    updateMember(member: RTChouseRoomMember) {
+      utils.updateData((newData: RTChouseData) => {
         newData.room.members.map((oldMember) => {
           if (oldMember.id === member.id) {
             return { oldMember, ...member };
@@ -68,8 +68,8 @@ export default function Room({
       });
     },
 
-    addMember(member: ShrughouseRoomMember) {
-      utils.updateData((newData: ShrughouseData, oldData: ShrughouseData) => {
+    addMember(member: RTChouseRoomMember) {
+      utils.updateData((newData: RTChouseData, oldData: RTChouseData) => {
         newData.room.members = oldData.room.members.filter(
           (oldMember) => oldMember.id !== member.id
         );
@@ -90,8 +90,8 @@ export default function Room({
       });
     },
 
-    removeMember(member: ShrughouseRoomMember) {
-      utils.updateData((newData: ShrughouseData, oldData: ShrughouseData) => {
+    removeMember(member: RTChouseRoomMember) {
+      utils.updateData((newData: RTChouseData, oldData: RTChouseData) => {
         let currentMember;
 
         newData.room.members = oldData.room.members.filter((oldMember) => {

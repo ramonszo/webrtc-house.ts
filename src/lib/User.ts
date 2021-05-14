@@ -1,5 +1,5 @@
-import { ShrughouseData, ShrughouseProps } from "../types";
-import { ShrughouseUserComponent } from "../types/components";
+import { RTChouseData, RTChouseProps } from "../types";
+import { RTChouseUserComponent } from "../types/components";
 
 import Utils from "./Utils";
 
@@ -7,13 +7,13 @@ export default function User({
   options,
   data,
   events,
-}: ShrughouseProps): ShrughouseUserComponent {
+}: RTChouseProps): RTChouseUserComponent {
   const utils = Utils({ options, data, events });
 
   const user = {
-    set(values: Partial<ShrughouseData["user"]>) {
-      utils.updateData((newData: ShrughouseData) => {
-        newData.user = values as ShrughouseData["user"];
+    set(values: Partial<RTChouseData["user"]>) {
+      utils.updateData((newData: RTChouseData) => {
+        newData.user = values as RTChouseData["user"];
 
         utils.dispatchEvent("user", {
           type: "update",

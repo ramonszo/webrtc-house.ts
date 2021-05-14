@@ -1,6 +1,6 @@
-import { Shrughouse, ShrughouseData, ShrughouseEvents } from "../types";
+import { RTChouse, RTChouseData, RTChouseEvents } from "../types";
 
-import ShrughouseOptions from "./Options";
+import RTChouseOptions from "./Options";
 
 import User from "./User";
 import Room from "./Room";
@@ -18,12 +18,12 @@ import Speaker from "../components/Speaker";
 
 import PeersAdapter from "../adapters/Peers";
 
-function Shrughouse(
-  customOptions: Partial<typeof ShrughouseOptions> = {}
-): Shrughouse {
-  const options = { ...ShrughouseOptions, ...customOptions };
+function RTChouse(
+  customOptions: Partial<typeof RTChouseOptions> = {}
+): RTChouse {
+  const options = { ...RTChouseOptions, ...customOptions };
 
-  const data: ShrughouseData = {
+  const data: RTChouseData = {
     user: {
       name: undefined,
       stream: undefined,
@@ -36,7 +36,7 @@ function Shrughouse(
     streams: [],
   };
 
-  const events: ShrughouseEvents = {
+  const events: RTChouseEvents = {
     data: [],
     user: [],
     room: [],
@@ -82,13 +82,13 @@ function Shrughouse(
 }
 
 if (typeof window !== "undefined") {
-  (window as any).Shrughouse = Shrughouse;
+  (window as any).RTChouse = RTChouse;
 }
 
-export default Shrughouse;
+export default RTChouse;
 
 export {
-  Shrughouse,
+  RTChouse,
   Panel,
   Container,
   Footer,

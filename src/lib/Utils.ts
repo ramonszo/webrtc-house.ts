@@ -1,8 +1,8 @@
 import {
-  ShrughouseData,
-  ShrughouseEvents,
-  ShrughouseProps,
-  ShrughouseUtilsComponent,
+  RTChouseData,
+  RTChouseEvents,
+  RTChouseProps,
+  RTChouseUtilsComponent,
 } from "../types";
 
 import Storage from "./Storage";
@@ -11,28 +11,25 @@ export default function Utils({
   options,
   data,
   events,
-}: ShrughouseProps): ShrughouseUtilsComponent {
+}: RTChouseProps): RTChouseUtilsComponent {
   const storage = Storage({ options, data, events });
 
   const utils = {
     addEventListener(
-      eventName: keyof ShrughouseEvents,
-      callback: (event: ShrughouseEvents[keyof ShrughouseEvents]) => void
+      eventName: keyof RTChouseEvents,
+      callback: (event: RTChouseEvents[keyof RTChouseEvents]) => void
     ): void {
       events[eventName].push(callback);
     },
 
-    dispatchEvent(eventName: keyof ShrughouseEvents, details: unknown): void {
+    dispatchEvent(eventName: keyof RTChouseEvents, details: unknown): void {
       events[eventName].forEach((eventFunc: (details: unknown) => void) => {
         eventFunc(details);
       });
     },
 
     updateData(
-      callback: (
-        data: ShrughouseData,
-        oldData: ShrughouseData
-      ) => ShrughouseData
+      callback: (data: RTChouseData, oldData: RTChouseData) => RTChouseData
     ): void {
       const oldData = { ...data };
 

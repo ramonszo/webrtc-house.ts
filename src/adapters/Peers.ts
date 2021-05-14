@@ -2,13 +2,13 @@ import SimplePeer from "simple-peer";
 import { io, Socket } from "socket.io-client";
 
 import {
-  Shrughouse,
-  ShrughouseData,
-  ShrughouseAdapterPeersData,
-  ShrughouseMediaStream,
-  ShrughouseSocketId,
-  ShrughouseAdapterProps,
-  ShrughouseAdapterActions,
+  RTChouse,
+  RTChouseData,
+  RTChouseAdapterPeersData,
+  RTChouseMediaStream,
+  RTChouseSocketId,
+  RTChouseAdapterProps,
+  RTChouseAdapterActions,
 } from "../types";
 
 import Utils from "../lib/Utils";
@@ -18,14 +18,14 @@ export default function AdapterPeers({
   data,
   events,
   room,
-}: ShrughouseAdapterProps): {
-  init: Shrughouse["init"];
-  action: Shrughouse["action"];
-  disconnect: Shrughouse["disconnect"];
+}: RTChouseAdapterProps): {
+  init: RTChouse["init"];
+  action: RTChouse["action"];
+  disconnect: RTChouse["disconnect"];
 } {
   const utils = Utils({ options, data, events });
 
-  const p2pData: ShrughouseAdapterPeersData = {
+  const p2pData: RTChouseAdapterPeersData = {
     peers: {},
     localStream: undefined,
     constraints: {
@@ -41,7 +41,7 @@ export default function AdapterPeers({
       navigator.mediaDevices
         .getUserMedia(p2pData.constraints)
         .then((stream) => {
-          utils.updateData((newData: ShrughouseData) => {
+          utils.updateData((newData: RTChouseData) => {
             newData.user.stream = stream;
 
             utils.dispatchEvent("user", {
@@ -102,7 +102,7 @@ export default function AdapterPeers({
         "action",
         (data: {
           socketId: string;
-          action: ShrughouseAdapterActions;
+          action: RTChouseAdapterActions;
           value: boolean | string | undefined;
         }) => {
           const { socketId, action, value } = data;
@@ -146,8 +146,8 @@ export default function AdapterPeers({
       });
     },
 
-    remove(socketId: ShrughouseSocketId): void {
-      utils.updateData((newData: ShrughouseData, oldData: ShrughouseData) => {
+    remove(socketId: RTChouseSocketId): void {
+      utils.updateData((newData: RTChouseData, oldData: RTChouseData) => {
         let currentStream;
 
         newData.streams = oldData.streams.filter((oldStream) => {
@@ -176,7 +176,7 @@ export default function AdapterPeers({
       }
     },
 
-    add(socketId: ShrughouseSocketId, initiator: boolean): void {
+    add(socketId: RTChouseSocketId, initiator: boolean): void {
       p2pData.peers[socketId] = new SimplePeer({
         initiator: initiator,
         stream: p2pData.localStream,
@@ -195,8 +195,8 @@ export default function AdapterPeers({
         }
       );
 
-      p2pData.peers[socketId].on("stream", (stream: ShrughouseMediaStream) => {
-        utils.updateData((newData: ShrughouseData) => {
+      p2pData.peers[socketId].on("stream", (stream: RTChouseMediaStream) => {
+        utils.updateData((newData: RTChouseData) => {
           const currentStream = {
             id: socketId,
             streamType: "audio",
@@ -215,15 +215,15 @@ export default function AdapterPeers({
       });
     },
 
-    get(id: ShrughouseSocketId): SimplePeer.Instance {
+    get(id: RTChouseSocketId): SimplePeer.Instance {
       return p2pData.peers[id];
     },
 
-    all(): ShrughouseAdapterPeersData["peers"] {
+    all(): RTChouseAdapterPeersData["peers"] {
       return p2pData.peers;
     },
 
-    action(action: ShrughouseAdapterActions): void {
+    action(action: RTChouseAdapterActions): void {
       let state: boolean | string | undefined;
 
       switch (action) {
@@ -271,7 +271,7 @@ export default function AdapterPeers({
           track.stop();
         });
 
-        utils.updateData((newData: ShrughouseData) => {
+        utils.updateData((newData: RTChouseData) => {
           newData.user.stream = undefined;
 
           utils.dispatchEvent("user", {
