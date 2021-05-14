@@ -4,6 +4,8 @@ import MicrophoneMutedIcon from "./Icons/MicrophoneMuted";
 import MicrophoneIcon from "./Icons/Microphone";
 
 export type SpeakerProps = {
+  key?: string; // necessary to keep Vanilla -> React compatibility
+  id: string;
   image?: string;
   name?: string;
   muted?: boolean;

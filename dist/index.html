@@ -22,7 +22,6 @@
 
         let room = undefined;
         let user = undefined;
-        let userId = undefined;
         let muted = false;
         let speakers = [];
 
@@ -44,7 +43,14 @@
         };
 
         const createMedia = (id, type, src) => {
-          const mediaContainer = document.querySelector('#media-container');
+          let mediaContainer = document.querySelector('#media-container');
+
+          if (!mediaContainer) {
+            mediaContainer = document.createElement('div');
+            mediaContainer.id = 'media-container';
+            mediaContainer.className = 'hidden';
+            document.body.appendChild(mediaContainer);
+          }
 
           if (!document.querySelector(`#${id}`)) {
             let newVid = document.createElement(type || 'media');
@@ -103,10 +109,12 @@
           );
         };
 
-        const startRoom = (name) => {
-          if (name.length > 0) {
+        const startRoom = () => {
+          document.location.hash = room;
+
+          if (room && room.length > 0) {
             zuckHouse.room.set({
-              name: name,
+              name: room,
             });
 
             zuckHouse.init(() => {
@@ -116,14 +124,10 @@
         };
 
         const roomChooser = () => {
-          const showNameChooser = (name) => {
-            document.location.hash = name;
-
-            nameChooser(name);
-          };
-
           if (document.location.hash.length > 1) {
-            showNameChooser(document.location.hash.slice(1));
+            room = document.location.hash.slice(1);
+
+            nameChooser();
 
             return;
           }
@@ -145,7 +149,8 @@
                       value = value.slice(0, 32);
                     }
 
-                    showNameChooser(value);
+                    room = value;
+                    nameChooser();
                   },
                 }),
               ],
@@ -155,7 +160,7 @@
           focusInput();
         };
 
-        const nameChooser = (roomName) => {
+        const nameChooser = () => {
           setRoot(
             zuckHouse.components.Panel({
               children: [
@@ -175,10 +180,9 @@
                         name: value,
                       });
 
-                      room = roomName;
                       user = value;
 
-                      startRoom(roomName);
+                      startRoom();
                     }
                   },
                 }),
@@ -233,7 +237,6 @@
         zuckHouse.on('disconnect', function () {
           room = undefined;
           user = undefined;
-          userId = undefined;
           muted = false;
           speakers = [];
 

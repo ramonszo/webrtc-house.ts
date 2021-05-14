@@ -10,7 +10,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
     />
   </head>
-  <body>
+  <body class="bg-yellow-50">
     <div id="root"></div>
 
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
@@ -18,19 +18,271 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
+      const { useState, useEffect } = React;
+
       const zuckHouse = RTChouse();
-      const Panel = zuckHouse.components.Panel;
+      const { Panel, Room, Form } = zuckHouse.components;
 
-      const App = (props) => {
-        const { title } = props;
+      function App() {
+        const [screen, setScreen] = useState(
+          document.location.hash.length > 1 ? 'name-chooser' : 'room-chooser'
+        );
 
-        return <Panel {...props} />;
-      };
+        const [room, setRoom] = useState(
+          document.location.hash.length > 1
+            ? document.location.hash.slice(1)
+            : undefined
+        );
 
-      ReactDOM.render(
-        <App title="React title" />,
-        document.getElementById('root')
-      );
+        const [user, setUser] = useState(undefined);
+        const [muted, setMuted] = useState(false);
+        const [speakers, setSpeakers] = useState([]);
+
+        const focusInput = () => {
+          const input = root.querySelector('form input');
+
+          if (input) {
+            input.value = '';
+            input.focus();
+          }
+        };
+
+        const getAvatar = (value) => {
+          return 'https://avatars.dicebear.com/api/micah/' + value + '.svg';
+        };
+
+        const createMedia = (id, type, src) => {
+          let mediaContainer = document.querySelector('#media-container');
+
+          if (!mediaContainer) {
+            mediaContainer = document.createElement('div');
+            mediaContainer.id = 'media-container';
+            mediaContainer.className = 'hidden';
+            document.body.appendChild(mediaContainer);
+          }
+
+          if (!document.querySelector(`#${id}`)) {
+            let newVid = document.createElement(type || 'media');
+
+            newVid.srcObject = src;
+            newVid.id = id;
+            newVid.playsinline = false;
+            newVid.autoplay = true;
+            newVid.className = 'vid';
+
+            if (id === 'user') {
+              newVid.muted = true;
+            }
+
+            mediaContainer.appendChild(newVid);
+          }
+        };
+
+        const removeMedia = (id) => {
+          const mediaEl = document.querySelector(`#${id}`);
+
+          if (mediaEl) {
+            const tracks = mediaEl.srcObject.getTracks();
+
+            tracks.forEach(function (track) {
+              track.stop();
+            });
+
+            mediaEl.srcObject = null;
+            mediaEl.parentNode.removeChild(mediaEl);
+          }
+        };
+
+        const updateRoom = () => {
+          setScreen('room');
+        };
+
+        const startRoom = () => {
+          document.location.hash = room;
+
+          if (room && room.length > 0) {
+            zuckHouse.room.set({
+              name: room,
+            });
+
+            zuckHouse.init(() => {
+              updateRoom();
+            });
+          }
+        };
+
+        const roomChooser = () => {
+          setScreen('room-chooser');
+
+          focusInput();
+        };
+
+        const nameChooser = () => {
+          setScreen('name-chooser');
+
+          focusInput();
+        };
+
+        zuckHouse.on('action', function (event) {
+          const action = event.type;
+          const { value } = event.detail;
+
+          if (action === 'mute') {
+            setMuted(!value);
+          }
+
+          updateRoom();
+        });
+
+        zuckHouse.on('user', function (event) {
+          const type = event.type;
+          const user = event.detail;
+
+          if (type === 'update') {
+            if (user.stream) {
+              createMedia('user', user.streamType, user.stream);
+            } else {
+              removeMedia('user');
+            }
+          }
+        });
+
+        zuckHouse.on('media', function (event) {
+          const type = event.type;
+          const stream = event.detail;
+
+          if (type === 'add') {
+            createMedia(
+              `stream-${stream.id}`,
+              stream.streamType,
+              stream.stream
+            );
+          } else if (type === 'remove') {
+            removeMedia(`stream-${stream.id}`);
+          }
+        });
+
+        zuckHouse.on('disconnect', function () {
+          setRoom(undefined);
+          setUser(undefined);
+          setMuted(false);
+          setSpeakers(() => []);
+
+          roomChooser();
+        });
+
+        zuckHouse.on('room:member', function (event) {
+          const member = event.detail;
+
+          if (event.type === 'add') {
+            member.image = getAvatar(member.name);
+
+            setSpeakers((oldSpeakers) => {
+              const filteredSpeakers = oldSpeakers.filter(
+                (speaker) => speaker.id !== member.id
+              );
+
+              return [...filteredSpeakers, member];
+            });
+          } else if (event.type === 'remove') {
+            setSpeakers((oldSpeakers) => {
+              return [
+                ...oldSpeakers.filter((speaker) => speaker.id !== member.id),
+              ];
+            });
+          } else if (event.type === 'update') {
+            setSpeakers((oldSpeakers) => {
+              return [
+                ...oldSpeakers.map((speaker) => {
+                  return speaker.id === member.id
+                    ? { ...speaker, ...member }
+                    : speaker;
+                }),
+              ];
+            });
+          }
+
+          updateRoom();
+        });
+
+        useEffect(() => {
+          if (document.location.hash.length > 1) {
+            focusInput();
+          }
+        }, []);
+
+        return (
+          <Panel>
+            {
+              {
+                room: (
+                  <Room
+                    title={room}
+                    speakers={speakers}
+                    muted={muted}
+                    onDisconnect={zuckHouse.disconnect}
+                    onAction={(action) => {
+                      if (action === 'add') {
+                        window.prompt(
+                          'Share this link with someone',
+                          location.href
+                        );
+                      } else {
+                        zuckHouse.action(action);
+                      }
+                    }}
+                  />
+                ),
+                'room-chooser': (
+                  <Form
+                    title="Enter room name"
+                    placeholderText="room name"
+                    actionText="continue"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+
+                      const form = event.target;
+
+                      let value = form.querySelector('input').value;
+                      if (value.length > 32) {
+                        value = value.slice(0, 32);
+                      }
+
+                      setRoom(value);
+                      nameChooser();
+                    }}
+                  />
+                ),
+                'name-chooser': (
+                  <Form
+                    title="Enter your name"
+                    placeholderText="your name"
+                    actionText="enter"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+
+                      const form = event.target;
+
+                      let value = form.querySelector('input').value;
+
+                      if (value.length > 0) {
+                        zuckHouse.user.set({
+                          name: value,
+                        });
+
+                        setUser(value);
+                        startRoom();
+                      }
+                    }}
+                  />
+                ),
+              }[screen]
+            }
+          </Panel>
+        );
+      }
+
+      ReactDOM.render(<App />, document.getElementById('root'));
     </script>
   <script src="/scripts/app.js"></script></body>
 </html>

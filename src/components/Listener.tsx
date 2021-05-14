@@ -1,6 +1,8 @@
 import JSX from "../lib/JSX";
 
 export type ListenerProps = {
+  key?: string; // necessary to keep Vanilla -> React compatibility
+  id: string;
   image?: string;
   name?: string;
 };

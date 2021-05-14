@@ -35,7 +35,7 @@ export default ({
           <section>
             <div className="grid gap-4 grid-cols-3 py-3 px-6">
               {speakers.map((member) => (
-                <Speaker {...member} />
+                <Speaker key={member.id} {...member} />
               ))}
             </div>
           </section>
@@ -45,8 +45,8 @@ export default ({
           <section className="mt-6">
             <h2 className="flex px-6 pb-0 font-semibold">Listeners</h2>
             <div className="grid gap-4 grid-cols-4 py-3 px-6">
-              {[1, 2, 3, 4].map((id) => (
-                <Listener name={`Listener ${id}`} />
+              {listeners.map((listener) => (
+                <Listener key={listener.id} {...listener} />
               ))}
             </div>
           </section>
