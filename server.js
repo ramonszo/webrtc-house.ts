@@ -52,6 +52,19 @@ io.on("connect", (socket) => {
     });
   });
 
+  // Send actions from user to other members
+  socket.on("action", (data) => {
+    for (const id in peers) {
+      if (id === socket.id) continue;
+
+      rooms[currentRoom][id].emit("action", {
+        action: data.action,
+        value: data.value,
+        socketId: socket.id,
+      });
+    }
+  });
+
   // Remove the disconnected peer connection from all other connected clients
   socket.on("disconnect", () => {
     socket.broadcast.emit("removePeer", socket.id);

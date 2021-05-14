@@ -63,7 +63,7 @@ export default function AdapterPeers({
         });
     },
 
-    initSocket(): void {
+    initSocket(callback: () => void): void {
       apiSocket = io(
         (location.protocol === "https:" ? "wss" : "ws") + "://" + options.api,
         { query: { room: data.room.name, user: data.user.name } }
@@ -98,6 +98,24 @@ export default function AdapterPeers({
         });
       });
 
+      apiSocket.on(
+        "action",
+        (data: {
+          socketId: string;
+          action: ShrughouseAdapterActions;
+          value: boolean | string | undefined;
+        }) => {
+          const { socketId, action, value } = data;
+
+          if (action === "mute") {
+            room.updateMember({
+              id: socketId,
+              muted: !value,
+            });
+          }
+        }
+      );
+
       apiSocket.on("removePeer", (socketId: string) => {
         p2p.remove(socketId);
 
@@ -114,6 +132,17 @@ export default function AdapterPeers({
 
       apiSocket.on("signal", (data) => {
         p2pData.peers[data.socketId].signal(data.signal);
+      });
+
+      apiSocket.on("connect", () => {
+        if (apiSocket) {
+          room.addMember({
+            id: apiSocket.id,
+            name: data.user.name,
+          });
+
+          callback();
+        }
       });
     },
 
@@ -195,20 +224,43 @@ export default function AdapterPeers({
     },
 
     action(action: ShrughouseAdapterActions): void {
+      let state: boolean | string | undefined;
+
       switch (action) {
         case "mute":
           (() => {
             const stream = p2pData.localStream;
 
             for (const index in stream.getAudioTracks()) {
-              stream.getAudioTracks()[index].enabled = !stream.getAudioTracks()[
-                index
-              ].enabled;
+              state = !stream.getAudioTracks()[index].enabled;
+              stream.getAudioTracks()[index].enabled = state;
+            }
+
+            if (apiSocket) {
+              room.updateMember({
+                id: apiSocket.id,
+                muted: !state,
+              });
             }
           })();
 
           break;
       }
+
+      if (apiSocket) {
+        apiSocket.emit("action", {
+          socketId: apiSocket.id,
+          action,
+          value: state,
+        });
+      }
+
+      utils.dispatchEvent("action", {
+        type: action,
+        detail: {
+          value: state,
+        },
+      });
     },
 
     disconnect(): void {
@@ -247,9 +299,9 @@ export default function AdapterPeers({
       }
     },
 
-    init(): void {
+    init(callback: () => void): void {
       p2p.initMedia(() => {
-        p2p.initSocket();
+        p2p.initSocket(callback);
       });
     },
   };

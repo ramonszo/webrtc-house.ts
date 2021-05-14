@@ -30,6 +30,10 @@ export type ShrughouseEvents = {
   media: ShrughouseEvent<ShrughouseMediaStream>[];
   disconnect: ShrughouseEvent<ShrughouseUser>[];
   error: ShrughouseEvents<{ message: string }>[];
+  action: ShrughouseEvents<{
+    action: string;
+    value: boolean | string | undefined;
+  }>[];
 };
 
 export type ShrughouseOptions = {

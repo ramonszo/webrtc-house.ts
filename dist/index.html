@@ -17,19 +17,28 @@
 
     <script>
       function app() {
+        const root = document.querySelector('#vanilla-root');
         const zuckHouse = Shrughouse();
 
         let room = undefined;
         let user = undefined;
+        let userId = undefined;
         let muted = false;
         let speakers = [];
 
         const setRoot = (el) => {
-          const root = document.querySelector('#vanilla-root');
-
           root.innerHTML = '';
           root.appendChild(el);
         };
+
+        const focusInput = () => {
+  const input = root.querySelector('form input');
+
+  console.log('focusInput', input);
+  if (input) {
+    input.focus();
+  }
+};
 
         const getAvatar = (value) => {
           return 'https://avatars.dicebear.com/api/micah/' + value + '.svg';
@@ -70,7 +79,7 @@
           }
         };
 
-        const updateRoom = (data) => {
+        const updateRoom = () => {
           setRoot(
             zuckHouse.components.Panel({
               children: [
@@ -101,9 +110,9 @@
               name: name,
             });
 
-            zuckHouse.init();
-
-            updateRoom();
+            zuckHouse.init(() => {
+              updateRoom();
+            });
           }
         };
 
@@ -143,6 +152,8 @@
               ],
             })
           );
+
+          focusInput();
         };
 
         const nameChooser = (roomName) => {
@@ -168,12 +179,6 @@
                       room = roomName;
                       user = value;
 
-                      speakers.push({
-                        id: 'me',
-                        name: value,
-                        image: getAvatar(value),
-                      });
-
                       startRoom(roomName);
                     }
                   },
@@ -181,9 +186,22 @@
               ],
             })
           );
+
+          focusInput();
         };
 
         roomChooser();
+
+        zuckHouse.on('action', function (event) {
+          const action = event.type;
+          const { value } = event.detail;
+
+          if (action === 'mute') {
+            muted = !value;
+          }
+
+          updateRoom();
+        });
 
         zuckHouse.on('user', function (event) {
           const type = event.type;
@@ -210,14 +228,13 @@
             );
           } else if (type === 'remove') {
             removeMedia(`stream-${stream.id}`);
-          } else {
-            // mute
           }
         });
 
         zuckHouse.on('disconnect', function () {
           room = undefined;
           user = undefined;
+          userId = undefined;
           muted = false;
           speakers = [];
 
@@ -231,8 +248,14 @@
             member.image = getAvatar(member.name);
 
             speakers.push(member);
-          } else {
-            speakers = speakers.filter((speakers) => speakers.id !== member.id);
+          } else if (event.type === 'remove') {
+            speakers = speakers.filter((speaker) => speaker.id !== member.id);
+          } else if (event.type === 'update') {
+            speakers = speakers.map((speaker) => {
+              return speaker.id === member.id
+                ? { ...speaker, ...member }
+                : speaker;
+            });
           }
 
           updateRoom();

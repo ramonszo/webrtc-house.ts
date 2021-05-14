@@ -41,6 +41,7 @@ function Shrughouse(
     user: [],
     room: [],
     "room:member": [],
+    action: [],
     disconnect: [],
     media: [],
     error: [],

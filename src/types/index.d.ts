@@ -49,7 +49,7 @@ export type Shrughouse = {
   };
   events: ShrughouseEvents;
   on: (eventName: keyof ShrughouseEvents, callback: () => void) => void;
-  init: () => void;
+  init: (callback: () => void) => void;
   action: (action: ShrughouseAdapterActions) => void;
   disconnect: () => void;
 };

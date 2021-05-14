@@ -44,6 +44,30 @@ export default function Room({
       });
     },
 
+    updateMember(member: ShrughouseRoomMember) {
+      utils.updateData((newData: ShrughouseData) => {
+        newData.room.members.map((oldMember) => {
+          if (oldMember.id === member.id) {
+            return { oldMember, ...member };
+          } else {
+            return oldMember;
+          }
+        });
+
+        utils.dispatchEvent("room:member", {
+          type: "update",
+          detail: member,
+        });
+
+        utils.dispatchEvent("room", {
+          type: "update",
+          detail: newData.room,
+        });
+
+        return newData;
+      });
+    },
+
     addMember(member: ShrughouseRoomMember) {
       utils.updateData((newData: ShrughouseData, oldData: ShrughouseData) => {
         newData.room.members = oldData.room.members.filter(

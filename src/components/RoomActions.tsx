@@ -29,7 +29,7 @@ export default ({
         {!muted ? (
           <MicrophoneIcon className="h-6 w-6" />
         ) : (
-          <MicrophoneMutedIcon />
+          <MicrophoneMutedIcon className="h-6 w-6" />
         )}
       </button>
     </div>
