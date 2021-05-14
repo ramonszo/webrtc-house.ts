@@ -32,13 +32,12 @@
         };
 
         const focusInput = () => {
-  const input = root.querySelector('form input');
+          const input = root.querySelector('form input');
 
-  console.log('focusInput', input);
-  if (input) {
-    input.focus();
-  }
-};
+          if (input) {
+            input.focus();
+          }
+        };
 
         const getAvatar = (value) => {
           return 'https://avatars.dicebear.com/api/micah/' + value + '.svg';
