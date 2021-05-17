@@ -1,4 +1,22 @@
-<!doctype html><html><head><title>RTChouse.ts</title><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"/></head><body class="bg-yellow-50"><div id="vanilla-root"></div><div id="media-container" class="hidden"></div><script>function app() {
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RTChouse.ts</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
+    />
+  </head>
+  <body class="bg-yellow-50">
+    <div id="vanilla-root"></div>
+    <div id="media-container" class="hidden"></div>
+
+    <script>
+      function app() {
         const root = document.querySelector('#vanilla-root');
         const zuckHouse = RTChouse();
 
@@ -248,4 +266,7 @@
 
       window.onload = () => {
         app();
-      };</script><script src="/scripts/app.min.js"></script></body></html>
+      };
+    </script>
+  <script src="/scripts/app.js"></script></body>
+</html>

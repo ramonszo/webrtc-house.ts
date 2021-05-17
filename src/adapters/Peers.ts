@@ -64,8 +64,9 @@ export default function AdapterPeers({
     },
 
     initSocket(callback: () => void): void {
+      const apiHost = options.api || location.hostname;
       apiSocket = io(
-        (location.protocol === "https:" ? "wss" : "ws") + "://" + options.api,
+        (location.protocol === "https:" ? "wss" : "ws") + "://" + apiHost,
         { query: { room: data.room.name, user: data.user.name } }
       );
 

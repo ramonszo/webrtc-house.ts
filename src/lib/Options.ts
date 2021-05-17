@@ -2,7 +2,7 @@ import { RTChouseOptions } from "../types";
 
 export default {
   storageName: "RTChouse",
-  api: "localhost:3013",
+  api: process.env.NODE_ENV === 'development' ? "localhost:3013" : undefined,
   icePolicy: "all",
   iceServers: [
     {

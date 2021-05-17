@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, "./", "dist")));
 const httpsServer = httpolyglot.createServer({}, app);
 const io = require("socket.io")(httpsServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000", // used on dev environment
     methods: ["GET", "POST"],
   },
 });

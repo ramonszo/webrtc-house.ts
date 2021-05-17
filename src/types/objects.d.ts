@@ -38,7 +38,7 @@ export type RTChouseEvents = {
 
 export type RTChouseOptions = {
   storageName: string;
-  api: string;
+  api?: string;
   mode: string;
   icePolicy: string;
   iceServers: (

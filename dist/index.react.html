@@ -1,4 +1,24 @@
-<html><head><title>RTChouse.ts</title><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0"/><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"/></head><body class="bg-yellow-50"><div id="root"></div><script src="https://unpkg.com/react@17/umd/react.development.js"></script><script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script><script src="https://unpkg.com/@babel/standalone/babel.min.js"></script><script type="text/babel">const { useState, useEffect } = React;
+<html>
+  <head>
+    <title>RTChouse.ts</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=0"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css"
+    />
+  </head>
+  <body class="bg-yellow-50">
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
 
       const zuckHouse = RTChouse();
       const { Panel, Room, Form } = zuckHouse.components;
@@ -262,4 +282,7 @@
         );
       }
 
-      ReactDOM.render(<App />, document.getElementById('root'));</script><script src="/scripts/app.min.js"></script></body></html>
+      ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+  <script src="/scripts/app.js"></script></body>
+</html>
