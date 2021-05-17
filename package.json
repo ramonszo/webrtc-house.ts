@@ -42,6 +42,7 @@
     "webpack-dev-server": "3.11.2"
   },
   "scripts": {
+    "start": "npm run server",
     "server": "node ./server.js",
     "server:dev": "webpack-dev-server",
     "watch": "webpack --config ./webpack.config.js --mode development",
