@@ -1,47 +1,47 @@
-const path = require('path');
-const webpack = require('webpack');
+const path = require("path");
+const webpack = require("webpack");
 
-const TerserPlugin = require('terser-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: ['./src/lib/index.ts'],
+  entry: ["./src/lib/index.ts"],
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ["babel-loader"],
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
-      }
-    ]
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+    ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: [".tsx", ".ts", ".js"],
   },
   output: {
     path: `${path.resolve(__dirname)}/dist`,
-    publicPath: '/',
-    filename: 'scripts/app.min.js'
+    publicPath: "/",
+    filename: "scripts/app.min.js",
   },
   optimization: {
-    minimizer: [new TerserPlugin()]
+    minimizer: [new TerserPlugin()],
   },
   plugins: [
     new webpack.DefinePlugin({
-      __DEV__: true
+      __DEV__: true,
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: 'src/index.html'
+      filename: "index.html",
+      template: "src/index.html",
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.react.html',
-      template: 'src/index.react.html'
-    })
-  ]
+      filename: "index.react.html",
+      template: "src/index.react.html",
+    }),
+  ],
 };
