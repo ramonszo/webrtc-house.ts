@@ -1,6 +1,6 @@
 {
-  "name": "RTChouse.ts",
-  "version": "0.0.1",
+  "name": "rtchouse",
+  "version": "1.0.0",
   "description": "Add voice rooms EVERYWHERE.",
   "main": "./src/app.ts",
   "devDependencies": {
@@ -50,7 +50,7 @@
     "build": "webpack --config ./webpack.prod.js --mode production"
   },
   "author": "Ramon Souza <https://ramon82.com>",
-  "license": "MIT",
+  "license": "CC BY-NC 4.0",
   "dependencies": {
     "express": "^4.17.1",
     "httpolyglot": "^0.1.2",
