@@ -50,11 +50,11 @@ client.on('room:member', function (event) {
 });
 ```
 
-You can check the [types](src/types) or [the demo](src/index.html) to get more details. There's also some ready to use [ui components](src/components) which can be customized.
+You can check the [types](https://github.com/ramon82/RTChouse.ts/blob/main/src/types) or [the demo](https://github.com/ramon82/RTChouse.ts/blob/main/src/index.html) to get more details. There's also some ready to use [ui components](https://github.com/ramon82/RTChouse.ts/blob/main/src/components) which can be customized.
 
 ## Limitations
 
-Peer to peer streams work well with a low number of connections, but the performance will decrease as more people join a room. To extend it to support a high number of participants a WebRTC media server is needed - which would require a new [adapter](src/adapters) on this library.
+Peer to peer streams work well with a low number of connections, but the performance will decrease as more people join a room. To extend it to support a high number of participants a WebRTC media server is needed - which would require a new [adapter](https://github.com/ramon82/RTChouse.ts/blob/main/src/adapters) on this library.
 
 ## Useful links
 - [Pion](https://github.com/pion/webrtc) - A performant WebRTC media server
