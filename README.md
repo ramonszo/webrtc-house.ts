@@ -1,4 +1,4 @@
-# RTCHouse.ts
+# rtc-house.ts
 
 [![RTCHouse.ts demo](https://raw.githubusercontent.com/ramon82/assets/master/RTChouse.ts/preview.png)](https://on.ramon82.com/3uZMe3I)
 
