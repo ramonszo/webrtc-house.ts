@@ -1,6 +1,6 @@
 # webrtc-house.ts
 
-[![RTCHouse.ts demo](https://raw.githubusercontent.com/ramon82/assets/master/RTChouse.ts/preview.png)](https://on.ramon82.com/3uZMe3I)
+[![webrtc-house.ts demo](https://raw.githubusercontent.com/ramonszo/assets/master/webrtc-house.ts/preview.png)](https://on.ramon.codes/3uZMe3I)
 
 ## Clubhouse clone using WebRTC and TypeScript
 
@@ -8,9 +8,9 @@ This script is a simple Clubhouse clone made just for studying purposes.
 
 It uses Websocket, WebRTC and JSX. Also works with React and Vanilla js while maintaning just one source of truth for the templates. 
 
-Live demo: https://on.ramon82.com/3uZMe3I
+Live demo: https://on.ramon.codes/3uZMe3I
 
-React sample: https://on.ramon82.com/2SdkbiD
+React sample: https://on.ramon.codes/2SdkbiD
 
 ## How to use
 
@@ -50,11 +50,11 @@ client.on('room:member', function (event) {
 });
 ```
 
-You can check the [types](https://github.com/ramon82/RTChouse.ts/blob/main/src/types) or [the demo](https://github.com/ramon82/RTChouse.ts/blob/main/src/index.html) to get more details. There's also some ready to use [ui components](https://github.com/ramon82/RTChouse.ts/blob/main/src/components) which can be customized.
+You can check the [types](https://github.com/ramonszo/webrtc-house.ts/blob/main/src/types) or [the demo](https://github.com/ramonszo/webrtc-house.ts/blob/main/src/index.html) to get more details. There's also some ready to use [ui components](https://github.com/ramonszo/webrtc-house.ts/blob/main/src/components) which can be customized.
 
 ## Limitations
 
-Peer to peer streams work well with a low number of connections, but the performance will decrease as more people join a room. To extend it to support a high number of participants a WebRTC media server is needed - which would require a new [adapter](https://github.com/ramon82/RTChouse.ts/blob/main/src/adapters) on this library.
+Peer to peer streams work well with a low number of connections, but the performance will decrease as more people join a room. To extend it to support a high number of participants a WebRTC media server is needed - which would require a new [adapter](https://github.com/ramonszo/webrtc-house.ts/blob/main/src/adapters) on this library.
 
 ## Useful links
 - [Pion](https://github.com/pion/webrtc) - A performant WebRTC media server
@@ -66,6 +66,6 @@ This package is licensed under the [Creative Commons Attribution-NonCommercial 4
 
 ---
 
-<a href="https://ramon82.com" target="_blank">
-  <img src="https://utils.ramon82.com/hit.svg?referrer=github.com&title=GitHub%20/%20RTCHouse.ts&location=https://github.com/ramon82/RTChouse.ts" width="24" height="24" />
+<a href="https://ramon.codes" target="_blank">
+  <img src="https://ws.ramon.codes/hit.svg?referrer=github.com&title=GitHub%20/%20webrtc-house.ts&location=https://github.com/ramonszo/webrtc-house.ts" width="24" height="24" />
 </a>
